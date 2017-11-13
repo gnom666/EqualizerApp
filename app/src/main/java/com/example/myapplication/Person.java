@@ -93,6 +93,23 @@ public class Person {
         this.error = new Error();
     }
 
+    public Person (Person person) {
+        this.id = person.id;
+        this.owns = person.owns;
+        this.activities = person.activities;
+        this.tasks = person.tasks;
+        this.paid = person.paid;
+        this.received = person.received;
+        this.firstName = person.firstName;
+        this.lastName = person.lastName;
+        this.modified = person.modified;
+        this.email = person.email;
+        this.password = person.password;
+        this.numpers = person.numpers;
+        this.enabled = person.enabled;
+        this.error = person.error;
+    }
+
     @Override
     public String toString() {
         return "Person{" +

@@ -2,6 +2,10 @@ package com.example.myapplication;
 
 public final class Constants {
 
+    public static String IP_HOME = "192.168.1.109";
+    public static String IP_WORK = "10.22.121.204";
+    public static String URL_UserById = "http://" + IP_WORK + ":9003/people/userbyid/";
+
     public enum ErrorCode {
         UNKNOWN,
         ACTIVITY_SERVICES,
