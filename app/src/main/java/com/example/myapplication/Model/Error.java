@@ -1,10 +1,8 @@
-package com.example.myapplication;
+package com.example.myapplication.Model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import com.example.myapplication.Constants.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,9 +14,9 @@ import com.example.myapplication.Constants.*;
 public class Error {
 
     @JsonProperty
-    public ErrorCode code;
+    public Constants.ErrorCode code;
     @JsonProperty
-    public ErrorType type;
+    public Constants.ErrorType type;
     @JsonProperty
     public String description;
     @JsonProperty
@@ -32,8 +30,8 @@ public class Error {
     }
 
     public Error() {
-        this.code = ErrorCode.UNKNOWN;
-        this.type = ErrorType.UNKNOWN;
+        this.code = Constants.ErrorCode.UNKNOWN;
+        this.type = Constants.ErrorType.UNKNOWN;
         this.description = "";
         this.timestamp = "";
     }
