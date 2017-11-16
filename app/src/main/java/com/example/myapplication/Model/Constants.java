@@ -4,10 +4,15 @@ public final class Constants {
 
     public static String IP_HOME = "192.168.1.109";
     public static String IP_WORK = "10.23.192.76";
-    public static String IP = IP_WORK;
+    public static String IP = IP_HOME;
     public static String PORT = "9003";
+
     public static String URL_UserById = "http://" + IP + ":" + PORT + "/people/userbyid/";
+    public static String URL_CheckUser = "http://" + IP + ":" + PORT + "/people/checkuser/";
+    public static String URL_CheckUserAndPass = "http://" + IP + ":" + PORT + "/people/checkuserandpass/";
     public static String URL_UsersList = "http://" + IP + ":" + PORT + "/people/userslist/";
+
+    public static String URL_ActivitiesByParticipant = "http://" + IP + ":" + PORT + "/activities/activitiesbyparticipant/";
 
     public enum ErrorCode {
         UNKNOWN,

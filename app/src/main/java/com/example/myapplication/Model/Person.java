@@ -90,7 +90,7 @@ public class Person {
         this.password = "";
         this.numpers = 1;
         this.enabled = true;
-        this.error = new Error();
+        this.error = null;
     }
 
     public Person (Person person) {

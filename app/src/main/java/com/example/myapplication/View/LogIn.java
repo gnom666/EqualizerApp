@@ -48,7 +48,7 @@ public class LogIn extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent registerIntent) {
         super.onActivityResult(requestCode, resultCode, registerIntent);
-        if(requestCode == rCode && resultCode == RESULT_OK){
+        if(requestCode == rCode && resultCode == RESULT_OK) {
             Log.i("u:p", registerIntent.getStringExtra("user")
                     + ":" + registerIntent.getStringExtra("password")
                     + " " + registerIntent.getStringExtra("firstName")

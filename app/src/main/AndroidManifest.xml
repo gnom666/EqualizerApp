@@ -25,6 +25,10 @@
         <activity
             android:name=".View.Register"
             android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".View.UserPage"
+            android:label="@string/title_activity_user_page"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

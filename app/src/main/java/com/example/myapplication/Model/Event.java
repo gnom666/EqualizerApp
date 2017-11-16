@@ -86,4 +86,22 @@ public class Event {
             this.error = activity.error;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", owner=" + owner +
+                ", participants=" + participants +
+                ", tasks=" + tasks +
+                ", payments=" + payments +
+                ", name='" + name + '\'' +
+                ", modified='" + modified + '\'' +
+                ", date='" + date + '\'' +
+                ", description='" + description + '\'' +
+                ", calculated=" + calculated +
+                ", total=" + total +
+                ", error=" + error +
+                '}';
+    }
 }
