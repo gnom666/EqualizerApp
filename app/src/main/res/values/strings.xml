@@ -3,4 +3,8 @@
     <string name="title_activity_log_in">Log or Sign in</string>
     <string name="title_activity_register">Register</string>
     <string name="title_activity_user_page">User Page</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
+    <string name="title_event_list">Events</string>
+    <string name="title_event_detail">Event Detail</string>
 </resources>

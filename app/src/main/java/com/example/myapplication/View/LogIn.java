@@ -7,8 +7,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.myapplication.Controller.PersonServices;
+import com.example.myapplication.Controller.VolleyCallback;
+import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 public class LogIn extends AppCompatActivity {
 
@@ -17,16 +26,41 @@ public class LogIn extends AppCompatActivity {
     public String user;
     public String password;
     int rCode = 20;
+    Intent me;
 
     public void loginClick (View view) {
         user = userEditText.getText().toString();
         password = passwordEditText.getText().toString();
         //Log.i("u:p", user + ":" + password);
-        Intent me = getIntent();
+        me = getIntent();
         me.putExtra("user", user);
         me.putExtra("password", password);
-        setResult(RESULT_OK, me);
-        finish();
+
+        PersonServices personServices = new PersonServices();
+        personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Person person = mapper.readValue(response, Person.class);
+
+                    if (person != null && person.id != 0) {
+                        me.putExtra("person", response);
+                        setResult(RESULT_OK, me);
+                        finish();
+                    } else {
+                        Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JsonParseException e) {
+                    e.printStackTrace();
+                } catch (JsonMappingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void registerClick (View view) {

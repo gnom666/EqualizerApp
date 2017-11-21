@@ -56,7 +56,7 @@ public class GenericServices {
         AppController.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public static void callListService (android.content.Context context, int method, String URL, final String paramName, final JSONObject paramJSON, final VolleyCallback callback) {
+    public static void callListService (android.content.Context context, int method, String URL, final String paramName, final JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,
                 URL, null, new Response.Listener<JSONArray>() {
@@ -71,13 +71,7 @@ public class GenericServices {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("error", "error response" + error.getMessage());
-                VolleyLog.d("error", "Error: " + error.getMessage());
-            }
-        })
+        }, errorListener)
         {
             @Override
             public Map<String, String> getHeaders() throws com.android.volley.AuthFailureError {

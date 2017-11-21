@@ -49,13 +49,18 @@ public class MainActivity extends AppCompatActivity {
             String password = loginIntent.getStringExtra("password");
             Log.i("u:p", user + ":" + password);
 
+            //Intent userPageIntent = new Intent(getApplicationContext(), UserPage.class);
             Intent userPageIntent = new Intent(getApplicationContext(), UserPage.class);
             userPageIntent.putExtra("user", user);
             userPageIntent.putExtra("password", password);
             startActivityForResult(userPageIntent, userPageRequestCode);
         }
+        if(requestCode == rCode && resultCode == RESULT_CANCELED) {
+            startActivityForResult(loginIntent, rCode);
+        }
         if (requestCode == userPageRequestCode && resultCode == RESULT_OK) {
             Log.i("info", "UserPage returned");
+            finish();
         }
     }
 }
