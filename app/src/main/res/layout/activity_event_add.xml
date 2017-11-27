@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.myapplication.View.UserPage">
+    tools:context="com.example.myapplication.View.EventAdd">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,18 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:clickable="true"
-        app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="right|bottom"
-        app:srcCompat="@android:drawable/ic_input_add" />
-
-    <include
-        android:id="@+id/include"
-        layout="@layout/content_user_page" />
+    <include layout="@layout/content_event_add" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -16,6 +16,8 @@ import java.util.List;
         "owns",
         "activities",
         "tasks",
+        "contacts",
+        "contactOf",
         "paid",
         "received",
         "firstName",
@@ -40,6 +42,10 @@ public class Person {
     public List<Long> paid;
     @JsonProperty
     public List<Long> received;
+    @JsonProperty
+    public List<Long> contacts;
+    @JsonProperty
+    public List<Long> contactOf;
     @JsonProperty
     public String firstName;
     @JsonProperty

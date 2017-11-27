@@ -3,7 +3,7 @@ package com.example.myapplication.Model;
 public final class Constants {
 
     public static String IP_HOME = "192.168.1.109";
-    public static String IP_WORK = "10.23.192.76";
+    public static String IP_WORK = "10.23.51.45";
     public static String IP = IP_WORK;
     public static String PORT = "9003";
 
@@ -11,8 +11,10 @@ public final class Constants {
     public static String URL_CheckUser = "http://" + IP + ":" + PORT + "/people/checkuser/";
     public static String URL_CheckUserAndPass = "http://" + IP + ":" + PORT + "/people/checkuserandpass/";
     public static String URL_UsersList = "http://" + IP + ":" + PORT + "/people/userslist/";
+    public static String URL_Contacts = "http://" + IP + ":" + PORT + "/people/contactsbyid/";
 
     public static String URL_ActivitiesByParticipant = "http://" + IP + ":" + PORT + "/activities/activitiesbyparticipant/";
+    public static String URL_AddActivity = "http://" + IP + ":" + PORT + "/activities/addactivity/";
 
     public static String URL_TasksByActivity = "http://" + IP + ":" + PORT + "/tasks/tasksbyact/";
 

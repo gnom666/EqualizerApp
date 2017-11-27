@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.VolleyCallback;
 import com.example.myapplication.Model.Person;
@@ -37,7 +40,8 @@ public class LogIn extends AppCompatActivity {
         me.putExtra("password", password);
 
         PersonServices personServices = new PersonServices();
-        personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
+        personServices.userByEmailAndPass(this, user, password,
+        new VolleyCallback() {
             @Override
             public void onSuccessResponse(String response) {
                 try {
@@ -59,6 +63,13 @@ public class LogIn extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        },
+        new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("error", "error response" + error.getMessage());
+                VolleyLog.d("error", "Error: " + error.getMessage());
             }
         });
     }

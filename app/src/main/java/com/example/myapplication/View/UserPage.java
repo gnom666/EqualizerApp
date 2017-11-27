@@ -2,6 +2,7 @@ package com.example.myapplication.View;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.example.myapplication.Model.Person;
 import com.example.myapplication.Model.Task;
 import com.example.myapplication.R;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,14 +49,17 @@ public class UserPage extends AppCompatActivity {
     ArrayList<Event> events;
     ArrayList<Pair<Long, ArrayList<Task>>> tasksByAct;
     HashMap<Long, Boolean> loadedTasksByEvents;
+    HashMap<Long, Person> persons;
 
     Intent me;
+    ObjectMapper mapper;
 
     String personJSON;
     String activitiesJSON;
+    private int eventAddCode = 40;
 
     public void showToast (String text) {
-        Toast.makeText(this, "text", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     public void checkAllLoaded() {
@@ -72,7 +77,6 @@ public class UserPage extends AppCompatActivity {
         new VolleyCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                ObjectMapper mapper = new ObjectMapper();
                 ArrayList<Task> tasks = null;
                 try {
                     tasks = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Task.class));
@@ -81,6 +85,9 @@ public class UserPage extends AppCompatActivity {
                             if (pair.first == aId) {
                                 for (Task t : tasks) {
                                     (pair.second).add(t);
+                                    if (!persons.containsKey(t.owner)) {
+                                        setPersons(t.owner);
+                                    }
                                 }
                                 loadedTasksByEvents.put(aId, true);
                                 break;
@@ -108,8 +115,6 @@ public class UserPage extends AppCompatActivity {
         new VolleyCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                activitiesJSON = response;
-                ObjectMapper mapper = new ObjectMapper();
                 try {
                     events = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Event.class));
                     if (events != null) {
@@ -165,15 +170,41 @@ public class UserPage extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_page);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    public void setPersons (final long pId) {
+        PersonServices personServices = new PersonServices();
+        personServices.userById(this, pId,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            Person person = mapper.readValue(response, Person.class);
 
+                            if (person != null && person.id != 0) {
+                                persons.put(pId, person);
+                            }
+
+                        }   catch (JsonParseException e) {
+                            e.printStackTrace();
+                        }   catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("error", "error response" + error.getMessage());
+                        VolleyLog.d("error", "Error: " + error.getMessage());
+                    }
+                });
+    }
+
+    public void initialize () {
         person = null;
         events = null;
+        persons = new HashMap<>();
         nameTextView = findViewById(R.id.fullNameTextView);
         emailTextView = findViewById(R.id.emailTextView);
         numpersTextView = findViewById(R.id.numpersTextView);
@@ -183,13 +214,14 @@ public class UserPage extends AppCompatActivity {
         String user = me.getStringExtra("user");
         String password = me.getStringExtra("password");
 
+        mapper = new ObjectMapper();
         PersonServices personServices = new PersonServices();
         personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
             @Override
             public void onSuccessResponse(String response) {
                 try {
                     personJSON = response;
-                    ObjectMapper mapper = new ObjectMapper();
+
                     person = mapper.readValue(response, Person.class);
 
                     idTextView.setText(String.valueOf(person.id));
@@ -209,17 +241,39 @@ public class UserPage extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("error", "error response" + error.getMessage());
+                VolleyLog.d("error", "Error: " + error.getMessage());
+            }
         });
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user_page);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        initialize();
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
+                Intent eventAddIntent = new Intent(getApplicationContext(), EventAdd.class);
+                try {
+                    eventAddIntent.putExtra("person", mapper.writeValueAsString(person));
+                }   catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                startActivityForResult(eventAddIntent, eventAddCode);
             }
-        });*/
+        });
     }
 
     @Override
@@ -235,6 +289,19 @@ public class UserPage extends AppCompatActivity {
         personJSON = String.valueOf(state.getCharSequence("Person"));
         activitiesJSON = String.valueOf(state.getCharSequence("Activities"));
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent loginIntent) {
+        super.onActivityResult(requestCode, resultCode, loginIntent);
+        if(requestCode == eventAddCode && resultCode == RESULT_OK) {
+            if (person != null) {
+                initialize();
+            }
+        }
+        if(requestCode == eventAddCode && resultCode == RESULT_CANCELED) {
+
+        }
     }
 
     public class EventsExpandableListAdapter extends BaseExpandableListAdapter {
@@ -331,7 +398,7 @@ public class UserPage extends AppCompatActivity {
             ((TextView) view.findViewById(R.id.taskNameTextView)).setText(t.name);
             ((TextView) view.findViewById(R.id.taskIdTextView)).setText(String.valueOf(t.id));
             (view.findViewById(R.id.taskIdTextView)).setVisibility(View.INVISIBLE);
-            ((TextView) view.findViewById(R.id.taskOwnerTextView)).setText(String.valueOf(t.owner));
+            ((TextView) view.findViewById(R.id.taskOwnerTextView)).setText(persons.get(t.owner).firstName + " " + persons.get(t.owner).lastName);
             ((TextView) view.findViewById(R.id.taskAmmountTextView)).setText(String.valueOf(t.ammount));
             (view.findViewById(R.id.taskInfoImageButton)).setFocusable(false);
 

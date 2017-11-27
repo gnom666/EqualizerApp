@@ -56,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(userPageIntent, userPageRequestCode);
         }
         if(requestCode == rCode && resultCode == RESULT_CANCELED) {
-            startActivityForResult(loginIntent, rCode);
+            if (loginIntent == null)
+                finish();
+            else
+                startActivityForResult(loginIntent, rCode);
         }
         if (requestCode == userPageRequestCode && resultCode == RESULT_OK) {
+            Log.i("info", "UserPage returned");
+            finish();
+        }
+        if (requestCode == userPageRequestCode) {
             Log.i("info", "UserPage returned");
             finish();
         }
