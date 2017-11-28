@@ -4,7 +4,7 @@ public final class Constants {
 
     public static String IP_HOME = "192.168.1.109";
     public static String IP_WORK = "10.23.51.45";
-    public static String IP = IP_WORK;
+    public static String IP = IP_HOME;
     public static String PORT = "9003";
 
     public static String URL_UserById = "http://" + IP + ":" + PORT + "/people/userbyid/";

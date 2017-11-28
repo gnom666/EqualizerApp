@@ -33,6 +33,10 @@
         <activity
             android:name=".View.EventAdd"
             android:label="@string/title_activity_event_add"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".View.EventDetail"
+            android:label="@string/title_activity_event_detail"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

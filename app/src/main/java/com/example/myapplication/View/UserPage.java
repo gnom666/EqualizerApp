@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,7 @@ public class UserPage extends AppCompatActivity {
     String personJSON;
     String activitiesJSON;
     private int eventAddCode = 40;
+    private int eventDetailCode = 50;
 
     public void showToast (String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
@@ -157,6 +159,13 @@ public class UserPage extends AppCompatActivity {
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                     Event e = events.get(groupPosition);
+
+                    //Log.i("name", ((TextView) v.findViewById(R.id.eventNameTextView)).getText().toString());
+                    /*((TextView) v.findViewById(R.id.eventIdTextView)).setText(String.valueOf(e.id));
+                    (v.findViewById(R.id.eventIdTextView)).setVisibility(View.INVISIBLE);
+                    ((TextView) v.findViewById(R.id.eventDateTextView)).setText(e.date);
+                    ((TextView) v.findViewById(R.id.eventDescriptionTextView)).setText(e.description);
+                    (v.findViewById(R.id.eventInfoImageButton)).setFocusable(false);*/
 
                     /*if (parent.isGroupExpanded(groupPosition)) {
                         parent.collapseGroup(groupPosition);
@@ -310,6 +319,8 @@ public class UserPage extends AppCompatActivity {
         //private ArrayList<ArrayList<Task>> children;
         private ArrayList<Pair<Long, ArrayList<Task>>> children;
         private LayoutInflater layOutInflater;
+        View.OnClickListener detailOnClickListener;
+        View.OnClickListener detailTaskOnClickListener;
 
         public EventsExpandableListAdapter () {
             layOutInflater = LayoutInflater.from(UserPage.this);
@@ -319,6 +330,42 @@ public class UserPage extends AppCompatActivity {
             this.groups = groups;
             this.children = children;
             layOutInflater = LayoutInflater.from(UserPage.this);
+
+            detailOnClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ImageButton detail = (ImageButton) view;
+                    long id =  Long.parseLong(detail.getTag().toString());
+                    Log.i("event", detail.getTag().toString());
+                    Event eventClicked = getEventById(id);
+                    if (eventClicked != null) {
+                        Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetail.class);
+                        try {
+                            eventDetailIntent.putExtra("person", mapper.writeValueAsString(person));
+                            eventDetailIntent.putExtra("event", mapper.writeValueAsString(eventClicked));
+                        }   catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                        startActivityForResult(eventDetailIntent, eventDetailCode);
+                    }
+                }
+            };
+
+            detailTaskOnClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("task", view.getTag().toString());
+                }
+            };
+        }
+
+        private Event getEventById (long id) {
+            for (Event e : groups) {
+                if (e.id == id) {
+                    return e;
+                }
+            }
+            return null;
         }
 
         @Override
@@ -385,7 +432,11 @@ public class UserPage extends AppCompatActivity {
             (view.findViewById(R.id.eventIdTextView)).setVisibility(View.INVISIBLE);
             ((TextView) view.findViewById(R.id.eventDateTextView)).setText(e.date);
             ((TextView) view.findViewById(R.id.eventDescriptionTextView)).setText(e.description);
-            (view.findViewById(R.id.eventInfoImageButton)).setFocusable(false);
+            ImageButton detail = (view.findViewById(R.id.eventInfoImageButton));
+            detail.setFocusable(false);
+            detail.setClickable(true);
+            detail.setTag(String.valueOf(e.id));
+            detail.setOnClickListener(detailOnClickListener);
 
             return view;
         }
@@ -400,7 +451,7 @@ public class UserPage extends AppCompatActivity {
             (view.findViewById(R.id.taskIdTextView)).setVisibility(View.INVISIBLE);
             ((TextView) view.findViewById(R.id.taskOwnerTextView)).setText(persons.get(t.owner).firstName + " " + persons.get(t.owner).lastName);
             ((TextView) view.findViewById(R.id.taskAmmountTextView)).setText(String.valueOf(t.ammount));
-            (view.findViewById(R.id.taskInfoImageButton)).setFocusable(false);
+            view.setTag(t.id);
 
             return view;
         }
