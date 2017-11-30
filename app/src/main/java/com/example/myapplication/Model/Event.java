@@ -8,9 +8,8 @@ import java.util.List;
 /**
  *
  */
-public class Event {
-    @JsonProperty
-    public long id;
+public class Event extends Entity {
+
     @JsonProperty
     public long owner;
     @JsonProperty
@@ -36,7 +35,7 @@ public class Event {
 
     public Event(long id, long owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
                        String modified, String date, String description, boolean calculated, double total, Error error) {
-        this.id = id;
+        super.id = id;
         this.owner = owner;
         this.participants = participants;
         this.tasks = tasks;
@@ -54,7 +53,7 @@ public class Event {
         this.participants = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.payments = new ArrayList<>();
-        this.id = 0;
+        super.id = 0;
         this.owner = 0;
         this.name = "";
         this.modified = "";
@@ -75,7 +74,7 @@ public class Event {
             for (Long t : activity.tasks) { this.tasks.add(t); }
             for (Long p : activity.payments) { this.payments.add(p); }
 
-            this.id = activity.id;
+            super.id = activity.id;
             this.owner = activity.owner;
             this.name = activity.name;
             this.modified = activity.modified;

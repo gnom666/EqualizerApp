@@ -2,10 +2,8 @@ package com.example.myapplication.Model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Task {
+public class Task extends Entity {
 
-    @JsonProperty
-    public long id;
     @JsonProperty
     public long owner;
     @JsonProperty
@@ -25,7 +23,7 @@ public class Task {
 
     public Task(long id, long owner, long activity, String name, String modified, String description,
                    boolean calculated,	double ammount, Error error) {
-        this.id = id;
+        super(id);
         this.owner = owner;
         this.activity = activity;
         this.name = name;
@@ -37,8 +35,8 @@ public class Task {
     }
 
     public Task(Task task) {
+        super(task.id);
         if (task != null) {
-            this.id = task.id;
             this.owner = task.owner;
             this.activity = task.activity;
             this.name = task.name;
@@ -51,7 +49,7 @@ public class Task {
     }
 
     public Task() {
-        this.id = 0;
+        super(0);
         this.owner = 0;
         this.activity = 0;
         this.name = "";

@@ -308,6 +308,11 @@ public class UserPage extends AppCompatActivity {
                 initialize();
             }
         }
+        if(requestCode == eventDetailCode && resultCode == RESULT_OK) {
+            if (person != null) {
+                initialize();
+            }
+        }
         if(requestCode == eventAddCode && resultCode == RESULT_CANCELED) {
 
         }

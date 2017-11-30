@@ -81,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@android:color/holo_blue_light"
+            android:onClick="onCancelClick"
             android:text="Cancel" />
 
         <Button
@@ -90,6 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@android:color/holo_blue_light"
+            android:onClick="onOkClick"
             android:text="Ok" />
     </LinearLayout>
 

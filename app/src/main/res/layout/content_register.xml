@@ -93,7 +93,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="cancelClick"
-                android:text="Cancel" />
+                android:text="Cancel"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:backgroundTint="@android:color/holo_blue_light"/>
 
             <Button
                 android:id="@+id/okButton"
@@ -101,6 +103,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="okClick"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:backgroundTint="@android:color/holo_blue_light"
                 android:text="Ok" />
 
         </LinearLayout>

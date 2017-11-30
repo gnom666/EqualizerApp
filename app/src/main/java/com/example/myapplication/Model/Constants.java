@@ -12,11 +12,15 @@ public final class Constants {
     public static String URL_CheckUserAndPass = "http://" + IP + ":" + PORT + "/people/checkuserandpass/";
     public static String URL_UsersList = "http://" + IP + ":" + PORT + "/people/userslist/";
     public static String URL_Contacts = "http://" + IP + ":" + PORT + "/people/contactsbyid/";
+    public static String URL_Participants = "http://" + IP + ":" + PORT + "/people/participantsbyact/";
 
     public static String URL_ActivitiesByParticipant = "http://" + IP + ":" + PORT + "/activities/activitiesbyparticipant/";
     public static String URL_AddActivity = "http://" + IP + ":" + PORT + "/activities/addactivity/";
+    public static String URL_ModifyActivity = "http://" + IP + ":" + PORT + "/activities/modifyactivity/";
 
     public static String URL_TasksByActivity = "http://" + IP + ":" + PORT + "/tasks/tasksbyact/";
+
+    public static String URL_TestPayments = "http://" + IP + ":" + PORT + "/payments/testpayments/";
 
     public enum ErrorCode {
         UNKNOWN,

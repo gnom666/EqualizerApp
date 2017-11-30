@@ -42,4 +42,11 @@ public class PersonServices {
 
         GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
     }
+
+    public void participants(android.content.Context context, long aId, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+
+        String URL = Constants.URL_Participants + "?aId=" + aId;
+
+        GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
 }

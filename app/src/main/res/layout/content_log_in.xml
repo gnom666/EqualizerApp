@@ -64,6 +64,8 @@
                 android:layout_weight="1"
                 android:onClick="registerClick"
                 android:padding="16dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:backgroundTint="@android:color/holo_blue_light"
                 android:text="Register" />
 
             <Button
@@ -73,6 +75,8 @@
                 android:layout_weight="1"
                 android:onClick="loginClick"
                 android:padding="16dp"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:backgroundTint="@android:color/holo_blue_light"
                 android:text="Log In" />
         </LinearLayout>
 

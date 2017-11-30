@@ -2,10 +2,8 @@ package com.example.myapplication.Model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Payment {
+public class Payment extends Entity{
 
-    @JsonProperty
-    public long id;
     @JsonProperty
     public long from;
     @JsonProperty
@@ -22,7 +20,7 @@ public class Payment {
     public Error error;
 
     public Payment (long id, long from, long to, long activity, String modified, double ammount, Constants.PaymentStatus status, Error error) {
-        this.id = id;
+        super.id = id;
         this.from = from;
         this.to = to;
         this.activity = activity;
@@ -34,7 +32,7 @@ public class Payment {
 
     public Payment (Payment payments) {
         if (payments != null) {
-            this.id = payments.id;
+            super.id = payments.id;
             this.from = payments.from;
             this.to = payments.to;
             this.activity = payments.activity;
@@ -46,7 +44,7 @@ public class Payment {
     }
 
     public Payment () {
-        this.id = 0;
+        super.id = 0;
         this.from = 0;
         this.to = 0;
         this.activity = 0;

@@ -29,7 +29,8 @@ import java.util.List;
         "enabled",
         "error"
 })
-public class Person {
+public class Person extends Entity {
+
     @JsonProperty
     public long id;
     @JsonProperty
@@ -66,6 +67,7 @@ public class Person {
     public Person(long id, List<Long> owns, List<Long> activities, List<Long> tasks, List<Long> paid,
                      List<Long> received, String firstName, String lastName, String modified, String email,
                      String password, int numpers, boolean enabled, Error error) {
+        super.id = id;
         this.id = id;
         this.owns = owns;
         this.activities = activities;
@@ -83,6 +85,7 @@ public class Person {
     }
 
     public Person() {
+        super.id = 0;
         this.id = 0;
         this.owns = new ArrayList<>();
         this.activities = new ArrayList<>();
@@ -100,6 +103,7 @@ public class Person {
     }
 
     public Person (Person person) {
+        super.id = person.id;
         this.id = person.id;
         this.owns = person.owns;
         this.activities = person.activities;

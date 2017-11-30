@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Role {
+public class Role extends Entity {
 
-    @JsonProperty
-    public long id;
     @JsonProperty
     public Constants.RoleType roleType;
     @JsonProperty
@@ -17,7 +15,7 @@ public class Role {
     public Error error;
 
     public Role(long id, Constants.RoleType roleType, List<Long> members, Error error) {
-        this.id = id;
+        super.id = id;
         this.roleType = roleType;
         this.members = members;
         this.error = error;
@@ -27,7 +25,7 @@ public class Role {
         this.members = new ArrayList<>();
 
         if (role != null) {
-            this.id = role.id;
+            super.id = role.id;
             this.roleType = role.roleType;
             for (long p : role.members) {
                 this.members.add(p);
@@ -37,7 +35,7 @@ public class Role {
     }
 
     public Role() {
-        this.id = 0;
+        super.id = 0;
         this.roleType = Constants.RoleType.GUEST;
         this.members = new ArrayList<>();
         this.error = null;
