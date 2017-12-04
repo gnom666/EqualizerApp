@@ -38,10 +38,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UserPage extends AppCompatActivity {
-    TextView nameTextView;
+    /*TextView nameTextView;
     TextView emailTextView;
     TextView numpersTextView;
-    TextView idTextView;
+    TextView idTextView;*/
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
@@ -75,7 +75,7 @@ public class UserPage extends AppCompatActivity {
 
     public void setTasksByActivity (final long aId) {
         TasksServices tasksServices = new TasksServices();
-        tasksServices.tasksByAct(this, String.valueOf(aId),
+        tasksServices.tasksByAct(this, aId,
         new VolleyCallback() {
             @Override
             public void onSuccessResponse(String response) {
@@ -214,10 +214,10 @@ public class UserPage extends AppCompatActivity {
         person = null;
         events = null;
         persons = new HashMap<>();
-        nameTextView = findViewById(R.id.fullNameTextView);
+        /*nameTextView = findViewById(R.id.fullNameTextView);
         emailTextView = findViewById(R.id.emailTextView);
         numpersTextView = findViewById(R.id.numpersTextView);
-        idTextView = findViewById(R.id.idTextView);
+        idTextView = findViewById(R.id.idTextView);*/
 
         me = getIntent();
         String user = me.getStringExtra("user");
@@ -233,10 +233,14 @@ public class UserPage extends AppCompatActivity {
 
                     person = mapper.readValue(response, Person.class);
 
-                    idTextView.setText(String.valueOf(person.id));
-                    nameTextView.setText(person.firstName + " " + person.lastName);
-                    emailTextView.setText(person.email);
-                    numpersTextView.setText(String.valueOf(person.numpers));
+                    //idTextView.setText(String.valueOf(person.id));
+                    //nameTextView.setText(person.firstName + " " + person.lastName);
+                    //emailTextView.setText(person.email);
+                    //numpersTextView.setText(String.valueOf(person.numpers));
+                    Toolbar tb = findViewById(R.id.toolbar);
+                    tb.setTitle(person.firstName + " " + person.lastName);
+                    tb.setSubtitle(person.email);
+                    //setActionBarTitle(nameTextView.getText().toString());
 
                     if (person != null) {
                         setActivities();
@@ -257,6 +261,11 @@ public class UserPage extends AppCompatActivity {
                 VolleyLog.d("error", "Error: " + error.getMessage());
             }
         });
+    }
+
+    private void setActionBarTitle(String s) {
+        this.setTitle(s);
+
     }
 
     @Override
@@ -344,7 +353,8 @@ public class UserPage extends AppCompatActivity {
                     Log.i("event", detail.getTag().toString());
                     Event eventClicked = getEventById(id);
                     if (eventClicked != null) {
-                        Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetail.class);
+                        //Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetail.class);
+                        Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetailed.class);
                         try {
                             eventDetailIntent.putExtra("person", mapper.writeValueAsString(person));
                             eventDetailIntent.putExtra("event", mapper.writeValueAsString(eventClicked));

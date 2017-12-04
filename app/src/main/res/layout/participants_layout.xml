@@ -14,15 +14,18 @@
 
 
    <CheckBox
-        android:id="@+id/participantCheckBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:checked="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+       android:id="@+id/participantCheckBox"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginBottom="8dp"
+       android:layout_marginTop="8dp"
+       android:layout_weight="1"
+       android:checked="false"
 
-        />
+       android:focusable="false"
+       android:focusableInTouchMode="false"
+       android:text="One two three"
+       android:textSize="20sp" />
 
 
 </LinearLayout>

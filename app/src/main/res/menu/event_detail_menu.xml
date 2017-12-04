@@ -3,11 +3,11 @@
 
     <item
         android:id="@+id/addTaskItem"
-        android:title="Add Task" />
+        android:title="@string/item_add_task" />
     <item
         android:id="@+id/calculateItem"
-        android:title="Calculate" />
+        android:title="@string/item_calculate" />
     <item
         android:id="@+id/removeItem"
-        android:title="Remove" />
+        android:title="@string/item_remove" />
 </menu>

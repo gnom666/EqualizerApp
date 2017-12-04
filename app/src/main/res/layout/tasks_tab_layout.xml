@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
     android:columnCount="6"
-    android:rowCount="1"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    android:rowCount="1">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -18,7 +19,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/taskNameTextView"
+            android:id="@+id/taskTabNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
@@ -31,7 +32,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/taskOwnerTextView"
+                android:id="@+id/taskTabOwnerTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -40,7 +41,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/taskIdTextView"
+                android:id="@+id/taskTabIdTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
@@ -50,7 +51,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/taskAmmountTextView"
+        android:id="@+id/taskTabAmmountTextView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_column="4"
@@ -60,6 +61,32 @@
         android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title"
         android:textSize="20sp" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="5"
+        android:layout_row="0"
+        android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/taskTabEditTabImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/background_light"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_action_edit_dark" />
+
+        <ImageButton
+            android:id="@+id/taskTabDeleteTabImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:background="@android:color/background_light"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_action_delete_dark" />
+    </LinearLayout>
 
 </GridLayout>

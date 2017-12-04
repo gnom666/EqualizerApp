@@ -18,12 +18,11 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/taskNameTextView"
+            android:id="@+id/paymentNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textSize="18sp" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,16 +30,14 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/taskOwnerTextView"
+                android:id="@+id/paymentPersonTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="top|start"
-                android:text="TextView"
-                android:textSize="12sp" />
+                android:text="TextView" />
 
             <TextView
-                android:id="@+id/taskIdTextView"
+                android:id="@+id/paymentIdTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
@@ -50,16 +47,32 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/taskAmmountTextView"
+        android:id="@+id/paymentAmmountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="3"
+        android:layout_row="0"
+        android:layout_rowSpan="1"
+        android:gravity="right"
+        android:paddingTop="8dp"
+        android:text="100.00"
+        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title" />
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_column="4"
-        android:layout_row="0"
-        android:gravity="right"
-        android:text="100.00"
-        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title"
-        android:textSize="20sp" />
+        android:layout_column="5"
+        android:gravity="center_vertical|center_horizontal|center|fill"
+        android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/imageButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="false"
+            app:srcCompat="@drawable/ic_action_add_circle" />
 
+    </LinearLayout>
 
 </GridLayout>

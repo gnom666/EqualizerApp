@@ -37,6 +37,10 @@
         <activity
             android:name=".View.EventDetail"
             android:label="@string/title_activity_event_detail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".View.EventDetailed"
+            android:label="@string/title_activity_event_detailed"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
