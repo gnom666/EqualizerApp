@@ -4,15 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:columnCount="6"
-    android:rowCount="1"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:rowCount="1">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:layout_column="0"
-        android:layout_columnSpan="4"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/paymentDirectionImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_action_chevron_right_red" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_columnSpan="3"
         android:layout_columnWeight="4"
         android:layout_gravity="left|center_vertical|fill_vertical"
         android:orientation="vertical">
@@ -30,7 +48,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/paymentPersonTextView"
+                android:id="@+id/paymentStatusTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -53,26 +71,9 @@
         android:layout_column="3"
         android:layout_row="0"
         android:layout_rowSpan="1"
-        android:gravity="right"
+        android:gravity="right|center_vertical"
         android:paddingTop="8dp"
         android:text="100.00"
         android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_column="5"
-        android:gravity="center_vertical|center_horizontal|center|fill"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/imageButton5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:focusable="false"
-            app:srcCompat="@drawable/ic_action_add_circle" />
-
-    </LinearLayout>
 
 </GridLayout>

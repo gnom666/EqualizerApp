@@ -20,8 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,15 +50,19 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 public class EventDetailed extends AppCompatActivity {
 
     Person person;
     ArrayList<Person> contacts;
+    ArrayList<Person> participants;
+    ArrayList<Person> originals;
     LinkedHashMap<Long, Boolean> selected;
     Event event;
-    boolean notOwner;
+    boolean notOwner = false;
     ArrayList<Payment> payments;
     ArrayList<Task> tasks;
 
@@ -64,6 +70,10 @@ public class EventDetailed extends AppCompatActivity {
     ParticipantsListAdapter participantsListAdapter;
     ListView tasksListView;
     TasksListAdapter tasksListAdapter;
+    ListView paymentsListView;
+    PaymentsListAdapter paymentsListAdapter;
+    LinearLayout buttonsLayout;
+    HashMap<Long, CheckBox> participantsCheckboxes;
 
     Intent me;
     ObjectMapper mapper;
@@ -99,7 +109,7 @@ public class EventDetailed extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detailed);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.eventDetailedToolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -133,6 +143,12 @@ public class EventDetailed extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        buttonsLayout = findViewById(R.id.buttonsLinearLayout);
+        if (buttonsLayout != null) {
+            setEditLayoutVisibility(false);
+            setEditLayoutEnabled(false);
+        }
 
         init ();
 
@@ -182,20 +198,23 @@ public class EventDetailed extends AppCompatActivity {
 
     public void tabSelected(TabLayout.Tab tab) {
         int position = tab.getPosition();
-        if (position == TASKS_POSITION) {
-            setFabVisibility(true);
-        }   else {
-            setFabVisibility(false);
-        }
 
         switch (position) {
             case TASKS_POSITION:
-                setTasksListView();
+                setFabVisibility(true);
+                setEditLayoutVisibility(false);
+                //setTasksListView();
                 break;
             case PARTICIPANTS_POSITION:
-                setParticipantsListView();
+                setFabVisibility(false);
+                setEditLayoutVisibility(true);
+                //setParticipantsListView();
+                if (participantsListAdapter != null)
+                    participantsListAdapter.notifyDataSetChanged();
                 break;
             case PAYMENTS_POSITION:
+                setFabVisibility(false);
+                setEditLayoutVisibility(false);
                 //setTasksListView();
                 break;
             default:
@@ -252,7 +271,6 @@ public class EventDetailed extends AppCompatActivity {
                                 }
 
                                 setParticipantsList(event.id);
-                                setTasks(event.id);
 
                             }
                         }   catch (IOException e) {
@@ -276,13 +294,18 @@ public class EventDetailed extends AppCompatActivity {
                     @Override
                     public void onSuccessResponse(String response) {
                         try {
-                            ArrayList<Person> persons = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Person.class));
-                            if (persons != null) {
-                                for (int i = 0; i < persons.size(); i++) {
-                                    if (persons.get(i).id != person.id) {
-                                        selected.put(persons.get(i).id, true);
+                            participants = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Person.class));
+                            originals = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Person.class));
+
+                            if (participants != null) {
+                                for (int i = 0; i < participants.size(); i++) {
+                                    if (participants.get(i).id != person.id) {
+                                        selected.put(participants.get(i).id, true);
                                     }
                                 }
+
+                                setTasks(event.id);
+                                setPayments(event.id);
 
                                 setParticipantsListView();
 
@@ -313,12 +336,15 @@ public class EventDetailed extends AppCompatActivity {
                             if (payments != null) {
 
                                 for (Payment p : payments) {
-                                    Person from = (Person ) Utils.byId(contacts, p.from, Person.class);
+                                    Person from = (Person ) Utils.byId(participants, p.from, Person.class);
                                     if (from == null) from = person;
-                                    Person to = (Person) Utils.byId(contacts, p.to, Person.class);
+                                    Person to = (Person) Utils.byId(participants, p.to, Person.class);
                                     if (to == null) to = person;
                                     Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.ammount + " )");
                                 }
+
+                                setPaymentsListView();
+
                             }
                         }   catch (IOException e) {
                             e.printStackTrace();
@@ -345,7 +371,7 @@ public class EventDetailed extends AppCompatActivity {
                             tasks = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Task.class));
                             if (tasks != null) {
                                 for (Task t : tasks) {
-                                    Person owner = (Person ) Utils.byId(contacts, t.owner, Person.class);
+                                    Person owner = (Person ) Utils.byId(participants, t.owner, Person.class);
                                     if (owner == null) owner = person;
                                     Log.i("task", t.name + " by " + owner.lastName);
                                 }
@@ -396,6 +422,40 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (notOwner) {
+            getMenuInflater().inflate(R.menu.event_detail_notowner_menu, menu);
+        }   else {
+            getMenuInflater().inflate(R.menu.event_detail_menu, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.calculateItem:
+                Log.i("item", "calculate");
+                setPayments(event.id);
+                break;
+            case R.id.addTaskItem:
+                Log.i("item", "add task");
+                break;
+            case R.id.removeItem:
+                Log.i("item", "remove");
+                break;
+            case R.id.getOutItem:
+                Log.i("item", "get out");
+                break;
+            default:
+                Log.i("item", "unknown");
+                break;
+        }
+        return true;
+    }*/
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -411,7 +471,7 @@ public class EventDetailed extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_edit) {
             return true;
         }
 
@@ -426,14 +486,62 @@ public class EventDetailed extends AppCompatActivity {
         }
     }
 
+    public void setEditLayoutVisibility (boolean visible) {
+        if (visible) {
+            buttonsLayout.setVisibility(View.VISIBLE);
+        }   else {
+            buttonsLayout.setVisibility(View.INVISIBLE);
+        }
+    }
 
+    public void setEditLayoutEnabled (boolean enabled) {
+        Button ok = findViewById(R.id.editParticipantsOkButton);
+        Button cancel = findViewById(R.id.editParticipantsCancelButton);
+        if (ok != null && cancel != null) {
+            ok.setEnabled(enabled);
+            cancel.setEnabled(enabled);
+        }
+    }
+
+
+
+
+    public void forceParticipantsListView () {
+
+        if (originals != null && !notOwner) {
+            Iterator it = selected.keySet().iterator();
+            while (it.hasNext()) {
+                selected.put((Long) it.next(), false);
+            }
+            for (int i = 0; i < originals.size(); i++) {
+                if (originals.get(i).id != person.id) {
+                    selected.put(originals.get(i).id, true);
+                }
+            }
+            it = participantsCheckboxes.values().iterator();
+            while (it.hasNext()) {
+                ((CheckBox)it.next()).setChecked(false);
+            }
+            for (int i = 0; i < originals.size(); i++) {
+                if (participantsCheckboxes.containsKey((Long) originals.get(i).id)) {
+                    participantsCheckboxes.get((Long) originals.get(i).id).setChecked(true);
+                }
+            }
+        }
+
+        participantsListAdapter.notifyDataSetChanged();
+    }
 
     public void setParticipantsListView () {
         if (participantsListView == null) {
             participantsListView = findViewById(R.id.detailedEventParticipantsListView);
         }
         if (participantsListAdapter == null) {
-            participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, contacts);
+            if (notOwner) {
+                participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, participants);
+            }   else {
+                participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, contacts);
+            }
             participantsListView.setAdapter(participantsListAdapter);
         }
 
@@ -458,9 +566,11 @@ public class EventDetailed extends AppCompatActivity {
                 public void onClick(View view) {
                     CheckBox checkBox = (CheckBox) view;
                     selected.put((long)checkBox.getTag(), checkBox.isChecked());
+                    setEditLayoutEnabled(true);
                 }
             };
 
+            participantsCheckboxes = new LinkedHashMap<>();
         }
 
         @Override
@@ -472,13 +582,18 @@ public class EventDetailed extends AppCompatActivity {
                 checkBox.setText(p.lastName);
                 checkBox.setTag(p.id);
                 checkBox.setOnClickListener(listener);
-                checkBox.setChecked(selected.get(contacts.get(position).id));
                 if (notOwner) {
+                    checkBox.setChecked(true);
                     checkBox.setFocusable(false);
                     checkBox.setClickable(false);
+                }   else {
+                    checkBox.setChecked(selected.get(contacts.get(position).id));
                 }
+                participantsCheckboxes.put(p.id, checkBox);
             }   else {
-                view.setSelected(selected.get(p.id));
+                CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
+                checkBox.setSelected(selected.get(p.id));
+                participantsCheckboxes.put(p.id, checkBox);
             }
 
             return view;
@@ -541,13 +656,13 @@ public class EventDetailed extends AppCompatActivity {
             name.setTag(t.id);
 
             TextView owner = view.findViewById(R.id.taskTabOwnerTextView);
-            Person ownerPerson = (Person ) Utils.byId(contacts, t.owner, Person.class);
+            Person ownerPerson = (Person ) Utils.byId(participants, t.owner, Person.class);
             if (ownerPerson == null) ownerPerson = person;
             owner.setText(ownerPerson.firstName + " " + ownerPerson.lastName);
             owner.setTag(ownerPerson.id);
 
             TextView amount = view.findViewById(R.id.taskTabAmmountTextView);
-            amount.setText(String.valueOf(t.ammount));
+            amount.setText(Utils.amount2string(t.ammount));
 
             ImageButton edit = view.findViewById(R.id.taskTabEditTabImageButton);
             edit.setOnClickListener(editListener);
@@ -560,6 +675,134 @@ public class EventDetailed extends AppCompatActivity {
             return view;
         }
 
+    }
+
+
+
+
+    public ArrayList<Payment> reducePayments (ArrayList<Payment> ps) {
+        ArrayList<Payment> newPs = new ArrayList<>();
+        for (Payment p : ps) {
+            if (p.from == person.id || p.to == person.id) {
+                newPs.add(p);
+            }
+        }
+        return newPs;
+    }
+
+    public void setPaymentsListView () {
+        if (paymentsListView == null) {
+            paymentsListView = findViewById(R.id.detailedEventPaymentsListView);
+        }
+        if (paymentsListAdapter == null) {
+            if (notOwner) {
+                paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, reducePayments(payments));
+            }   else {
+                paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, payments);
+            }
+            paymentsListView.setAdapter(paymentsListAdapter);
+        }
+
+    }
+
+    public class PaymentsListAdapter extends ArrayAdapter<Payment> {
+
+        private ArrayList<Payment> payments;
+        private Context context;
+        View.OnClickListener deleteListener;
+        View.OnClickListener editListener;
+
+        public PaymentsListAdapter(@NonNull final Context context, int resource, @NonNull ArrayList<Payment> payments) {
+            super(context, resource, payments);
+            this.payments = payments;
+
+            this.context = context;
+            if (layOutInflater == null)
+                layOutInflater = LayoutInflater.from(EventDetailed.this);
+
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            Payment p = getItem(position);
+            boolean mustPay = true;
+
+            if (p != null && person != null && p.from != person.id) {
+                mustPay = false;
+            }
+
+            view = layOutInflater.inflate(R.layout.payments_layout, null);
+            view.setTag(p.id);
+
+            TextView name = view.findViewById(R.id.paymentNameTextView);
+            TextView status = view.findViewById(R.id.paymentStatusTextView);
+            TextView amount = view.findViewById(R.id.paymentAmmountTextView);
+            ImageButton direction = view.findViewById(R.id.paymentDirectionImageButton);
+
+            if (notOwner) {
+                if (mustPay) {
+                    Person to = (Person) Utils.byId(contacts, p.to, Person.class);
+                    if (to == null) {
+                        to = (Person) Utils.byId(participants, p.to, Person.class);
+                    }
+                    name.setText(to.firstName + " " + to.lastName);
+                }   else {
+                    Person from = (Person) Utils.byId(contacts, p.from, Person.class);
+                    if (from == null) {
+                        from = (Person) Utils.byId(participants, p.from, Person.class);
+                    }
+                    name.setText(from.firstName + " " + from.lastName);
+                }
+
+                status.setText(p.status.toString());
+
+                amount.setText(Utils.amount2string(p.ammount));
+
+                if (!mustPay) {
+                    direction.setImageResource(R.drawable.ic_action_chevron_left_green);
+                }
+            }   else {
+                String text = "";
+                String sep = " - ";
+
+                direction.setImageResource(R.drawable.ic_action_keyboard_arrow_right);
+
+                Person from = (Person) Utils.byId(participants, p.from, Person.class);
+                if (from.id == person.id) {
+                    direction.setImageResource(R.drawable.ic_action_chevron_right_red);
+                    sep = "";
+                }   else {
+                    text += from.firstName + " " + from.lastName;
+                }
+
+                Person to = (Person) Utils.byId(participants, p.to, Person.class);
+                if (to.id == person.id) {
+                    direction.setImageResource(R.drawable.ic_action_chevron_left_green);
+                    sep = "";
+                }   else {
+                    text += sep + to.firstName + " " + to.lastName;
+                }
+
+                name.setText(text);
+
+                status.setText(p.status.toString());
+
+                amount.setText(Utils.amount2string(p.ammount));
+
+            }
+
+            return view;
+        }
+
+    }
+
+    public void onOkClick (View view) {
+
+    }
+
+    public void onCancelClick (View view) {
+        forceParticipantsListView();
+        setEditLayoutEnabled(false);
     }
 
 }

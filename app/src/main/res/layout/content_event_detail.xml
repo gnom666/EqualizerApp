@@ -16,6 +16,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout11"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,17 +49,6 @@
             android:hint="Date yyyy-MM-dd"
             android:inputType="date"
             android:text="2017-12-13" />
-
-        <TextView
-            android:id="@+id/participantsTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Select participants" />
-
-        <ListView
-            android:id="@+id/detailEventParticipantsListView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
     </LinearLayout>
 

@@ -2,9 +2,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.myapplication.View.EventDetailed">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_edit"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_edit"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_calculate"
+        android:orderInCategory="100"
+        android:title="@string/action_calculate"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_delete"
+        android:orderInCategory="100"
+        android:title="@string/action_delete"
+        app:showAsAction="never" />
+
 </menu>

@@ -11,8 +11,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.example.myapplication.Controller.PersonServices;
+import com.example.myapplication.Controller.VolleyCallback;
+import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +35,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     String password;
     String rpassword;
     String numpers;
+    Person newPerson;
+
     EditText userEditText;
     EditText passwordEditText;
     EditText repeatedPasswordEditText;
@@ -31,24 +44,86 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     EditText lastNameEditText;
     Spinner numpersSpinner;
 
+    Intent me;
+    ObjectMapper mapper;
+
     public void okClick (View view) {
         user = userEditText.getText().toString();
         password = passwordEditText.getText().toString();
         rpassword = repeatedPasswordEditText.getText().toString();
         firstName = firstNameEditText.getText().toString();
         lastName = lastNameEditText.getText().toString();
+
         if (password.equals(rpassword)) {
-            Intent me = getIntent();
+
             me.putExtra("user", user);
             me.putExtra("password", password);
             me.putExtra("firstName", firstName);
             me.putExtra("lastName", lastName);
             me.putExtra("numpers", numpers);
-            setResult(RESULT_OK, me);
-            finish();
+
+            newPerson = new Person();
+            newPerson.firstName = firstName;
+            newPerson.lastName = lastName;
+            newPerson.email = user;
+            newPerson.password = password;
+            newPerson.numpers = Integer.valueOf(numpers);
+
+            try {
+                register();
+            }   catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }   catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }   else {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void register () throws JsonProcessingException, JSONException {
+        user = userEditText.getText().toString();
+        password = passwordEditText.getText().toString();
+        //Log.i("u:p", user + ":" + password);
+        me = getIntent();
+        me.putExtra("user", user);
+        me.putExtra("password", password);
+
+        PersonServices personServices = new PersonServices();
+        personServices.addPerson(this, "PersonOut",
+                new JSONObject(mapper.writeValueAsString(newPerson)),
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+
+                        try {
+                            Person person = mapper.readValue(response, Person.class);
+
+                            if (person != null) {
+                                if (person.error != null) {
+                                    Toast.makeText(getApplicationContext(), person.error.description, Toast.LENGTH_SHORT).show();
+                                }   else {
+
+                                    setResult(RESULT_OK, me);
+                                    finish();
+
+                                }
+                            }   else {
+                                Toast.makeText(getApplicationContext(), "person=null", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT);
+                    }
+                });
     }
 
     public void cancelClick (View view) {
@@ -68,6 +143,9 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
         setContentView(R.layout.activity_register);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        me = getIntent();
+        mapper = new ObjectMapper();
 
         numpers = "1";
         userEditText = findViewById(R.id.emailEditText);

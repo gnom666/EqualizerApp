@@ -57,7 +57,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_column="5"
-        android:layout_gravity="right"
+        android:layout_gravity="right|center"
+        android:background="@android:color/transparent"
         app:srcCompat="@drawable/ic_action_keyboard_arrow_right" />
 
 </GridLayout>

@@ -157,7 +157,7 @@ public class EventAdd extends AppCompatActivity {
     public void addEvent () throws JsonProcessingException, JSONException {
         EventServices eventServices = new EventServices();
 
-        eventServices.addActivity(this, "PersonOut",
+        eventServices.addActivity(this, "EventOut",
                 new JSONObject(mapper.writeValueAsString(newEvent)),
                 new VolleyCallback() {
                     @Override

@@ -31,7 +31,7 @@
             android:ems="10"
             android:hint="Name"
             android:inputType="textPersonName"
-            android:text="Bithday" />
+            android:text="Birthday" />
 
         <EditText
             android:id="@+id/addEventDescriptionEditText"

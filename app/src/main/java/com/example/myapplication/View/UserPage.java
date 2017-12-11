@@ -27,6 +27,7 @@ import com.example.myapplication.Controller.VolleyCallback;
 import com.example.myapplication.Model.Event;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.Model.Task;
+import com.example.myapplication.Model.Utils;
 import com.example.myapplication.R;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -465,7 +466,7 @@ public class UserPage extends AppCompatActivity {
             ((TextView) view.findViewById(R.id.taskIdTextView)).setText(String.valueOf(t.id));
             (view.findViewById(R.id.taskIdTextView)).setVisibility(View.INVISIBLE);
             ((TextView) view.findViewById(R.id.taskOwnerTextView)).setText(persons.get(t.owner).firstName + " " + persons.get(t.owner).lastName);
-            ((TextView) view.findViewById(R.id.taskAmmountTextView)).setText(String.valueOf(t.ammount));
+            ((TextView) view.findViewById(R.id.taskAmmountTextView)).setText(Utils.amount2string(t.ammount));
             view.setTag(t.id);
 
             return view;

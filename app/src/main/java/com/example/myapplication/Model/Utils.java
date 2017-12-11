@@ -1,10 +1,7 @@
 package com.example.myapplication.Model;
 
+import java.text.DecimalFormat;
 import java.util.List;
-
-/**
- * Created by jorgerios on 30/11/17.
- */
 
 public class Utils {
     public static Entity result;
@@ -27,5 +24,10 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static String amount2string (double amount) {
+        DecimalFormat decim = new DecimalFormat("#.00");
+        return decim.format(amount);
     }
 }

@@ -52,15 +52,15 @@ public class LogIn extends AppCompatActivity {
                         me.putExtra("person", response);
                         setResult(RESULT_OK, me);
                         finish();
-                    } else {
+                    }   else {
                         Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
                     }
 
-                } catch (JsonParseException e) {
+                }   catch (JsonParseException e) {
                     e.printStackTrace();
-                } catch (JsonMappingException e) {
+                }   catch (JsonMappingException e) {
                     e.printStackTrace();
-                } catch (IOException e) {
+                }   catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -68,7 +68,8 @@ public class LogIn extends AppCompatActivity {
         new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("error", "error response" + error.getMessage());
+                Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
+                Log.e("error", "error response: " + error.getMessage());
                 VolleyLog.d("error", "Error: " + error.getMessage());
             }
         });
@@ -94,11 +95,11 @@ public class LogIn extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent registerIntent) {
         super.onActivityResult(requestCode, resultCode, registerIntent);
         if(requestCode == rCode && resultCode == RESULT_OK) {
-            Log.i("u:p", registerIntent.getStringExtra("user")
+            /*Log.i("u:p", registerIntent.getStringExtra("user")
                     + ":" + registerIntent.getStringExtra("password")
                     + " " + registerIntent.getStringExtra("firstName")
                     + " " + registerIntent.getStringExtra("lastName")
-                    + " " + registerIntent.getStringExtra("numpers"));
+                    + " " + registerIntent.getStringExtra("numpers"));*/
             user = registerIntent.getStringExtra("user");
             password = registerIntent.getStringExtra("password");
             if (user != null && password != null) {

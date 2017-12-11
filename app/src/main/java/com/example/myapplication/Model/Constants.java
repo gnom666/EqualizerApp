@@ -4,7 +4,9 @@ public final class Constants {
 
     public static String IP_HOME = "192.168.1.109";
     public static String IP_WORK = "10.23.51.45";
-    public static String IP = IP_HOME;
+    public static String IP_EC2 = "18.217.53.37";
+    public static String DNS_GLOBAL = "ec2-18-220-66-164.us-east-2.compute.amazonaws.com";
+    public static String IP = DNS_GLOBAL;
     public static String PORT = "9003";
 
     public static String URL_UserById = "http://" + IP + ":" + PORT + "/people/userbyid/";
@@ -13,6 +15,8 @@ public final class Constants {
     public static String URL_UsersList = "http://" + IP + ":" + PORT + "/people/userslist/";
     public static String URL_Contacts = "http://" + IP + ":" + PORT + "/people/contactsbyid/";
     public static String URL_Participants = "http://" + IP + ":" + PORT + "/people/participantsbyact/";
+    public static String URL_AddPerson = "http://" + IP + ":" + PORT + "/people/addperson/";
+    public static String URL_ModifyPerson = "http://" + IP + ":" + PORT + "/people/modifyperson/";
 
     public static String URL_ActivitiesByParticipant = "http://" + IP + ":" + PORT + "/activities/activitiesbyparticipant/";
     public static String URL_AddActivity = "http://" + IP + ":" + PORT + "/activities/addactivity/";
@@ -52,7 +56,7 @@ public final class Constants {
         return codeName;
     }
 
-    public enum ErrorType {
+    public static enum ErrorType {
         UNKNOWN,
         ACTIVITY_NOT_FOUND,
         PAYMENT_NOT_FOUND,
@@ -63,12 +67,14 @@ public final class Constants {
         PAYMENT_USERMISSMATCH,
         PAYMENT_CLOSED,
         ZERO_PERSONS,
-        INCORRECT_PASSWORD
+        INCORRECT_PASSWORD,
+        BAD_DATE_FORMAT,
+        EXISTENT_DATA
     }
 
     public static String errorTypeName (ErrorType type) {
 
-        String typeName;
+        String typeName = "";
         switch (type) {
             case ACTIVITY_NOT_FOUND:
                 typeName = "ACTIVITY_NOT_FOUND";
@@ -99,6 +105,12 @@ public final class Constants {
                 break;
             case INCORRECT_PASSWORD:
                 typeName = "INCORRECT_PASSWORD";
+                break;
+            case BAD_DATE_FORMAT:
+                typeName = "BAD_DATE_FORMAT";
+                break;
+            case EXISTENT_DATA:
+                typeName = "EXISTENT_DATA";
                 break;
             default:
                 typeName = "UNKNOWN";

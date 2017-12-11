@@ -4,6 +4,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.example.myapplication.Model.Constants;
 
+import org.json.JSONObject;
+
 public class PersonServices {
 
     public void userById (android.content.Context context, long pId, final VolleyCallback callback, final Response.ErrorListener errorListener) {
@@ -48,5 +50,17 @@ public class PersonServices {
         String URL = Constants.URL_Participants + "?aId=" + aId;
 
         GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
+
+    public void addPerson (android.content.Context context, String paramName, JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+        String URL = Constants.URL_AddPerson;
+
+        GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
+    }
+
+    public void modifyPerson (android.content.Context context, String paramName, JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+        String URL = Constants.URL_ModifyPerson;
+
+        GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
     }
 }
