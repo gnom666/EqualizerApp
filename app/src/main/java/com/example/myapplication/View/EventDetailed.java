@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,7 +34,6 @@ import com.example.myapplication.Controller.PaymentServices;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.TasksServices;
 import com.example.myapplication.Controller.VolleyCallback;
-import com.example.myapplication.Model.Error;
 import com.example.myapplication.Model.Event;
 import com.example.myapplication.Model.Payment;
 import com.example.myapplication.Model.Person;
@@ -57,11 +55,13 @@ import java.util.LinkedHashMap;
 public class EventDetailed extends AppCompatActivity {
 
     Person person;
+    String personJson;
     ArrayList<Person> contacts;
     ArrayList<Person> participants;
     ArrayList<Person> originals;
     LinkedHashMap<Long, Boolean> selected;
     Event event;
+    String eventJson;
     boolean notOwner = false;
     ArrayList<Payment> payments;
     ArrayList<Task> tasks;
@@ -88,6 +88,8 @@ public class EventDetailed extends AppCompatActivity {
     final int TASKS_POSITION = 0;
     final int PARTICIPANTS_POSITION = 1;
     final int PAYMENTS_POSITION = 2;
+    private int eventDetailCode = 10;
+    private int taskAddCode = 20;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -139,8 +141,7 @@ public class EventDetailed extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                addTask();
             }
         });
 
@@ -227,12 +228,13 @@ public class EventDetailed extends AppCompatActivity {
 
 
 
+
     private void init() {
 
         mThis = this;
         me = getIntent();
-        String personJson = me.getStringExtra("person");
-        String eventJson = me.getStringExtra("event");
+        personJson = me.getStringExtra("person");
+        eventJson = me.getStringExtra("event");
         selected = new LinkedHashMap<>();
 
         tabTasks = new TabTasks();
@@ -246,6 +248,14 @@ public class EventDetailed extends AppCompatActivity {
         }   catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (person == null || event == null) {
+            finish();
+        }
+
+        Toolbar tb = findViewById(R.id.eventDetailedToolbar);
+        tb.setTitle(event.name);
+        tb.setSubtitle(event.description + " (" + event.date + ")");
 
         if (person.id != event.owner) {
             notOwner = true;
@@ -270,7 +280,7 @@ public class EventDetailed extends AppCompatActivity {
                                     selected.put(contacts.get(i).id, false);
                                 }
 
-                                setParticipantsList(event.id);
+                                setParticipantsList(event.id, false);
 
                             }
                         }   catch (IOException e) {
@@ -286,7 +296,7 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    public void setParticipantsList (final long aId) {
+    public void setParticipantsList (final long aId, final boolean force) {
         PersonServices personServices = new PersonServices();
 
         personServices.participants(this, aId,
@@ -304,10 +314,11 @@ public class EventDetailed extends AppCompatActivity {
                                     }
                                 }
 
-                                setTasks(event.id);
-                                setPayments(event.id);
+                                setTasks(event.id, force);
+                                setPayments(event.id, force);
 
-                                setParticipantsListView();
+                                if (!force) setParticipantsListView();
+                                else forceParticipantsListView();
 
                             }
                         }   catch (IOException e) {
@@ -323,7 +334,7 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    public void setPayments (final long aId) {
+    public void setPayments (final long aId, final boolean force) {
 
         PaymentServices paymentServices = new PaymentServices();
 
@@ -343,7 +354,8 @@ public class EventDetailed extends AppCompatActivity {
                                     Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.ammount + " )");
                                 }
 
-                                setPaymentsListView();
+                                if (!force) setPaymentsListView();
+                                else forcePaymentsListView();
 
                             }
                         }   catch (IOException e) {
@@ -359,7 +371,7 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    public void setTasks (final long aId) {
+    public void setTasks (final long aId, final boolean force) {
 
         TasksServices tasksServices = new TasksServices();
 
@@ -376,7 +388,8 @@ public class EventDetailed extends AppCompatActivity {
                                     Log.i("task", t.name + " by " + owner.lastName);
                                 }
 
-                                setTasksListView();
+                                if (!force) setTasksListView();
+                                else forceTasksListView();
 
                             }
 
@@ -393,25 +406,42 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    public void updateEvent () throws JsonProcessingException, JSONException {
+    public void updateEvent (Event toUpdate) throws JsonProcessingException, JSONException {
         EventServices eventServices = new EventServices();
 
         eventServices.modifyActivity(this, "PersonOut",
-                new JSONObject(mapper.writeValueAsString(event)),
+                new JSONObject(mapper.writeValueAsString(toUpdate)),
                 new VolleyCallback() {
                     @Override
                     public void onSuccessResponse(String response) {
 
-                        if (!response.equals("OK")) {
-                            try {
-                                Error error = mapper.readValue(response, Error.class);
-                                Toast.makeText(getApplicationContext(), error.description, Toast.LENGTH_SHORT).show();
-                            }   catch (IOException e) {
-                                e.printStackTrace();
+
+                        try {
+                            Event updatedEvent = mapper.readValue(response, Event.class);
+
+                            if (updatedEvent != null) {
+                                if (updatedEvent.error == null) {
+                                    event = updatedEvent;
+                                    me.putExtra("event", mapper.writeValueAsString(updatedEvent));
+                                }   else {
+                                    Toast.makeText(getApplicationContext(), updatedEvent.error.description, Toast.LENGTH_SHORT).show();
+                                }
+                            }   else {
+                                Toast.makeText(getApplicationContext(), "null Event returned", Toast.LENGTH_SHORT).show();
                             }
-                        }   else {
-                            Toast.makeText(getApplicationContext(), "Event updated", Toast.LENGTH_SHORT).show();
+
+                        }   catch (IOException e) {
+                            e.printStackTrace();
                         }
+
+                        participants.clear();
+                        originals.clear();
+                        Iterator it = selected.keySet().iterator();
+                        while (it.hasNext()) selected.put((Long) it.next(), false);
+                        setParticipantsList(event.id, true);
+                        forceBackParticipantsListView();
+                        participantsListAdapter.notifyDataSetChanged();
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -422,40 +452,6 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (notOwner) {
-            getMenuInflater().inflate(R.menu.event_detail_notowner_menu, menu);
-        }   else {
-            getMenuInflater().inflate(R.menu.event_detail_menu, menu);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.calculateItem:
-                Log.i("item", "calculate");
-                setPayments(event.id);
-                break;
-            case R.id.addTaskItem:
-                Log.i("item", "add task");
-                break;
-            case R.id.removeItem:
-                Log.i("item", "remove");
-                break;
-            case R.id.getOutItem:
-                Log.i("item", "get out");
-                break;
-            default:
-                Log.i("item", "unknown");
-                break;
-        }
-        return true;
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -465,17 +461,26 @@ public class EventDetailed extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_edit) {
-            return true;
+        switch (id) {
+            case R.id.action_edit:
+                if (notOwner) {
+                    Toast.makeText(this, R.string.owner_can_edit, Toast.LENGTH_SHORT).show();
+                }   else {
+                    editEvent();
+                }
+                return true;
+            case R.id.action_calculate:
+                Toast.makeText(this, "calculate", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_delete:
+                Toast.makeText(this, "delete", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void setFabVisibility (boolean visible) {
@@ -503,10 +508,53 @@ public class EventDetailed extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if(requestCode == eventDetailCode && resultCode == RESULT_OK) {
+            eventJson = intent.getStringExtra("event");
+            try {
+                event = mapper.readValue(eventJson, Event.class);
+            }   catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            setResult(RESULT_OK, me);
+
+            Toolbar tb = findViewById(R.id.eventDetailedToolbar);
+            tb.setTitle(event.name);
+            tb.setSubtitle(event.description + " (" + event.date + ")");
+            
+        }
+        if(requestCode == eventDetailCode && resultCode == RESULT_CANCELED) {
+
+        }
+
+        if(requestCode == taskAddCode && resultCode == RESULT_OK) {
+            eventJson = intent.getStringExtra("task");
+            try {
+                Task task = mapper.readValue(eventJson, Task.class);
+                tasks.add(task);
+            }   catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            setTasks(event.id, true);
+            setPayments(event.id, true);
+
+            setResult(RESULT_OK, me);
+
+        }
+        if(requestCode == taskAddCode && resultCode == RESULT_CANCELED) {
+
+        }
+    }
 
 
 
-    public void forceParticipantsListView () {
+
+    public void forceBackParticipantsListView () {
 
         if (originals != null && !notOwner) {
             Iterator it = selected.keySet().iterator();
@@ -530,6 +578,19 @@ public class EventDetailed extends AppCompatActivity {
         }
 
         participantsListAdapter.notifyDataSetChanged();
+    }
+
+    public void forceParticipantsListView () {
+        participantsListView = findViewById(R.id.detailedEventParticipantsListView);
+
+        if (notOwner) {
+            participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, participants);
+        }   else {
+            participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, contacts);
+        }
+        participantsListView.setAdapter(participantsListAdapter);
+
+
     }
 
     public void setParticipantsListView () {
@@ -579,7 +640,7 @@ public class EventDetailed extends AppCompatActivity {
             if (view == null) {
                 view = layOutInflater.inflate(R.layout.participants_layout, null);
                 CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
-                checkBox.setText(p.lastName);
+                checkBox.setText(p.firstName + " " + p.lastName);
                 checkBox.setTag(p.id);
                 checkBox.setOnClickListener(listener);
                 if (notOwner) {
@@ -592,7 +653,8 @@ public class EventDetailed extends AppCompatActivity {
                 participantsCheckboxes.put(p.id, checkBox);
             }   else {
                 CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
-                checkBox.setSelected(selected.get(p.id));
+                boolean checked = (selected.get(p.id) != null)? selected.get(p.id): true;
+                checkBox.setSelected(checked);
                 participantsCheckboxes.put(p.id, checkBox);
             }
 
@@ -603,6 +665,14 @@ public class EventDetailed extends AppCompatActivity {
 
 
 
+    public void forceTasksListView () {
+
+        tasksListView = findViewById(R.id.detailedEventTasksListView);
+
+        tasksListAdapter = new TasksListAdapter((Context) mThis, 0, tasks);
+        tasksListView.setAdapter(tasksListAdapter);
+
+    }
 
     public void setTasksListView () {
         if (tasksListView == null) {
@@ -688,6 +758,16 @@ public class EventDetailed extends AppCompatActivity {
             }
         }
         return newPs;
+    }
+
+    public void forcePaymentsListView () {
+        paymentsListView = findViewById(R.id.detailedEventPaymentsListView);
+        if (notOwner) {
+            paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, reducePayments(payments));
+        }   else {
+            paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, payments);
+        }
+        paymentsListView.setAdapter(paymentsListAdapter);
     }
 
     public void setPaymentsListView () {
@@ -797,12 +877,51 @@ public class EventDetailed extends AppCompatActivity {
     }
 
     public void onOkClick (View view) {
-
+        Event newEvent = new Event(event);
+        newEvent.participants.clear();
+        Iterator it = selected.keySet().iterator();
+        while (it.hasNext()) {
+            Long id = (Long) it.next();
+            if (selected.get(id)) {
+                newEvent.participants.add(id);
+            }
+        }
+        newEvent.participants.add(person.id);
+        try {
+            updateEvent(newEvent);
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }   catch (JSONException e) {
+            e.printStackTrace();
+        }
+        setEditLayoutEnabled(false);
     }
 
     public void onCancelClick (View view) {
-        forceParticipantsListView();
+        forceBackParticipantsListView();
         setEditLayoutEnabled(false);
+    }
+
+    public void editEvent () {
+        Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetail.class);
+        try {
+            eventDetailIntent.putExtra("person", mapper.writeValueAsString(person));
+            eventDetailIntent.putExtra("event", mapper.writeValueAsString(event));
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        startActivityForResult(eventDetailIntent, eventDetailCode);
+    }
+
+    public void addTask () {
+        Intent taskAddIntent = new Intent(getApplicationContext(), TaskAdd.class);
+        try {
+            taskAddIntent.putExtra("person", mapper.writeValueAsString(person));
+            taskAddIntent.putExtra("event", mapper.writeValueAsString(event));
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        startActivityForResult(taskAddIntent, taskAddCode);
     }
 
 }

@@ -5,7 +5,7 @@ public final class Constants {
     public static String IP_HOME = "192.168.1.109";
     public static String IP_WORK = "10.23.51.45";
     public static String IP_EC2 = "18.217.53.37";
-    public static String DNS_GLOBAL = "ec2-18-220-66-164.us-east-2.compute.amazonaws.com";
+    public static String DNS_GLOBAL = "ec2-54-146-133-217.compute-1.amazonaws.com"; // "ec2-18-220-66-164.us-east-2.compute.amazonaws.com";
     public static String IP = DNS_GLOBAL;
     public static String PORT = "9003";
 
@@ -23,6 +23,8 @@ public final class Constants {
     public static String URL_ModifyActivity = "http://" + IP + ":" + PORT + "/activities/modifyactivity/";
 
     public static String URL_TasksByActivity = "http://" + IP + ":" + PORT + "/tasks/tasksbyact/";
+    public static String URL_AddTask = "http://" + IP + ":" + PORT + "/tasks/addtask/";
+    public static String URL_ModifyTask = "http://" + IP + ":" + PORT + "/tasks/modifytask/";
 
     public static String URL_TestPayments = "http://" + IP + ":" + PORT + "/payments/testpayments/";
 

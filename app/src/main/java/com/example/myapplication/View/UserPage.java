@@ -72,6 +72,8 @@ public class UserPage extends AppCompatActivity {
         }
         if (allLoaded)
             setListView();
+
+        if (expandableListAdapter != null) expandableListAdapter.notifyAll();
     }
 
     public void setTasksByActivity (final long aId) {

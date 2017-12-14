@@ -21,7 +21,6 @@ import com.android.volley.VolleyError;
 import com.example.myapplication.Controller.EventServices;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.VolleyCallback;
-import com.example.myapplication.Model.Error;
 import com.example.myapplication.Model.Event;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
@@ -163,15 +162,21 @@ public class EventAdd extends AppCompatActivity {
                     @Override
                     public void onSuccessResponse(String response) {
 
-                        if (!response.equals("OK")) {
-                            try {
-                                Error error = mapper.readValue(response, Error.class);
-                                Toast.makeText(getApplicationContext(), error.description, Toast.LENGTH_SHORT);
-                            }   catch (IOException e) {
-                                e.printStackTrace();
+                        try {
+                            Event createdEvent = mapper.readValue(response, Event.class);
+
+                            if (createdEvent != null) {
+                                if (createdEvent.error == null) {
+                                    me.putExtra("event", mapper.writeValueAsString(createdEvent));
+                                }   else {
+                                    Toast.makeText(getApplicationContext(), createdEvent.error.description, Toast.LENGTH_SHORT).show();
+                                }
+                            }   else {
+                                Toast.makeText(getApplicationContext(), "null Event returned", Toast.LENGTH_SHORT).show();
                             }
-                        }   else {
-                            Toast.makeText(getApplicationContext(), "Event created", Toast.LENGTH_SHORT);
+
+                        }   catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 },
@@ -227,12 +232,5 @@ public class EventAdd extends AppCompatActivity {
             return view;
         }
 
-/*
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Toast.makeText((Context) mThis, "sdfasfd", Toast.LENGTH_SHORT);
-            Log.i("sdfasdfasdf", "asdaSCASDC");
-            selected.put(getItem(i).id, ((CheckBox)view).isSelected());
-        }*/
     }
 }

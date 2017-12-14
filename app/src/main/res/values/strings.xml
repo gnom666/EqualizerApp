@@ -22,4 +22,7 @@
     <string name="item_calculate">Calculate</string>
     <string name="item_remove">Remove</string>
 
+    <string name="owner_can_edit">Only owner can edit</string>
+    <string name="title_activity_task_add">TaskAdd</string>
+
 </resources>
