@@ -53,12 +53,14 @@
 
     <ImageButton
         android:id="@+id/eventInfoImageButton"
-        style="@android:style/Widget.DeviceDefault.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_column="5"
         android:layout_gravity="right|center"
+        android:layout_margin="16dp"
+        android:padding="6dp"
         android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
         app:srcCompat="@drawable/ic_action_keyboard_arrow_right" />
 
 </GridLayout>

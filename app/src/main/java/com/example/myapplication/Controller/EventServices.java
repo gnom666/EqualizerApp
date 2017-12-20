@@ -26,4 +26,10 @@ public class EventServices {
 
         GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
     }
+
+    public void deleteActivity (android.content.Context context, long eventId, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+        String URL = Constants.URL_DeleteActivity + "?aId=" + eventId;
+
+        GenericServices.callService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
 }

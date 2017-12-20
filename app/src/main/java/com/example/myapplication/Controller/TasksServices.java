@@ -15,6 +15,12 @@ public class TasksServices {
         GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
     }
 
+    public void deleteTask (android.content.Context context, long taskId, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+        String URL = Constants.URL_DeleteTask + "?tId=" + taskId;
+
+        GenericServices.callService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
+
     public void addTask (android.content.Context context, String paramName, JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {
         String URL = Constants.URL_AddTask;
 

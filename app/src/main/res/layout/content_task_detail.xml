@@ -5,55 +5,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.myapplication.View.EventDetail"
-    tools:showIn="@layout/activity_event_detail">
+    tools:context="com.example.myapplication.View.TaskDetail"
+    tools:showIn="@layout/activity_task_detail">
 
     <LinearLayout
-        android:id="@+id/linearLayout10"
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:gravity="center_vertical"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout11"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <EditText
-            android:id="@+id/detailedEventNameEditText"
+            android:id="@+id/addTaskNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Name"
-            android:inputType="textPersonName"
-            android:text="Bithday" />
+            android:inputType="text"
+            android:text="Task 1" />
 
         <EditText
-            android:id="@+id/detailedEventDescriptionEditText"
+            android:id="@+id/addTaskDescriptionEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Description"
-            android:inputType="textPersonName"
-            android:text="My birthday" />
+            android:inputType="textAutoComplete"
+            android:text="The first Task!" />
 
         <EditText
-            android:id="@+id/detailedEventDateEditText"
+            android:id="@+id/addTaskAmountEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Date yyyy-MM-dd"
-            android:inputType="date"
-            android:text="2017-12-13" />
+            android:hint="0.00"
+            android:inputType="numberDecimal" />
+
+
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout11"
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -65,24 +68,24 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <Button
-            android:id="@+id/detailedEventCancelButton"
+            android:id="@+id/addTaskCancelButton"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@android:color/holo_blue_light"
-            android:onClick="onCancelClick"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:onClick="onCancelClick"/>
 
         <Button
-            android:id="@+id/detailedEventOkButton"
-            style="@style/Widget.AppCompat.Button.Colored"
+            android:id="@+id/addTaskOkButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:backgroundTint="@android:color/holo_blue_light"
-            android:onClick="onOkClick"
-            android:text="Save" />
+            android:text="Save"
+            android:onClick="onOkClick"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -10,10 +10,12 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +48,7 @@ public class UserPage extends AppCompatActivity {
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
+    ProgressBar progressBar;
 
     Person person;
     ArrayList<Event> events;
@@ -55,25 +58,170 @@ public class UserPage extends AppCompatActivity {
 
     Intent me;
     ObjectMapper mapper;
+    FloatingActionButton fab;
+    FloatingActionButton fabContacts;
 
     String personJSON;
     String activitiesJSON;
     private int eventAddCode = 40;
     private int eventDetailCode = 50;
+    private int contactsCode = 60;
 
-    public void showToast (String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user_page);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        initialize();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent eventAddIntent = new Intent(getApplicationContext(), EventAdd.class);
+                try {
+                    eventAddIntent.putExtra("person", mapper.writeValueAsString(person));
+                }   catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                startActivityForResult(eventAddIntent, eventAddCode);
+            }
+        });
+
+        fabContacts = (FloatingActionButton) findViewById(R.id.fabContacts);
+        fabContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent contactsIntent = new Intent(getApplicationContext(), Contacts.class);
+                try {
+                    contactsIntent.putExtra("person", mapper.writeValueAsString(person));
+                }   catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                startActivityForResult(contactsIntent, contactsCode);
+            }
+        });
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putCharSequence("Person", personJSON);
+        state.putCharSequence("Activities", activitiesJSON);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        personJSON = String.valueOf(state.getCharSequence("Person"));
+        activitiesJSON = String.valueOf(state.getCharSequence("Activities"));
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent loginIntent) {
+        super.onActivityResult(requestCode, resultCode, loginIntent);
+        if(requestCode == eventAddCode && resultCode == RESULT_OK) {
+            if (person != null) {
+                if (expandableListView != null) expandableListView.setVisibility(View.INVISIBLE);
+                initialize();
+            }
+        }
+        if(requestCode == eventDetailCode && resultCode == RESULT_OK) {
+            if (person != null) {
+                if (expandableListView != null) expandableListView.setVisibility(View.INVISIBLE);
+                initialize();
+            }
+        }
+        if(requestCode == eventDetailCode && resultCode == RESULT_CANCELED) {
+            if (person != null) {
+                if (expandableListView != null) expandableListView.setVisibility(View.INVISIBLE);
+                initialize();
+            }
+        }
+        if(requestCode == eventAddCode && resultCode == RESULT_CANCELED) {
+
+        }
+    }
+
+
+
+    public void initialize () {
+        person = null;
+        events = null;
+        persons = new HashMap<>();
+        /*nameTextView = findViewById(R.id.fullNameTextView);
+        emailTextView = findViewById(R.id.emailTextView);
+        numpersTextView = findViewById(R.id.numpersTextView);
+        idTextView = findViewById(R.id.idTextView);*/
+
+        me = getIntent();
+        String user = me.getStringExtra("user");
+        String password = me.getStringExtra("password");
+
+        progressBar = findViewById(R.id.userPageProgressBar);
+        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.animate();
+
+        mapper = new ObjectMapper();
+        PersonServices personServices = new PersonServices();
+        personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                try {
+                    personJSON = response;
+
+                    person = mapper.readValue(response, Person.class);
+
+                    //idTextView.setText(String.valueOf(person.id));
+                    //nameTextView.setText(person.firstName + " " + person.lastName);
+                    //emailTextView.setText(person.email);
+                    //numpersTextView.setText(String.valueOf(person.numpers));
+                    Toolbar tb = findViewById(R.id.toolbar);
+                    tb.setTitle(person.firstName + " " + person.lastName);
+                    tb.setSubtitle(person.email);
+                    //setActionBarTitle(nameTextView.getText().toString());
+
+                    if (person != null) {
+                        setActivities();
+                    }
+
+                }   catch (JsonParseException e) {
+                    e.printStackTrace();
+                }   catch (JsonMappingException e) {
+                    e.printStackTrace();
+                }   catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("error", "error response" + error.getMessage());
+                VolleyLog.d("error", "Error: " + error.getMessage());
+            }
+        });
+    }
+
+
 
     public void checkAllLoaded() {
         boolean allLoaded = true;
         for (boolean b : loadedTasksByEvents.values()) {
             allLoaded &= b;
         }
-        if (allLoaded)
+        if (allLoaded) {
             setListView();
+            progressBar.setVisibility(View.INVISIBLE);
+            expandableListView.setVisibility(View.VISIBLE);
+        }
 
-        if (expandableListAdapter != null) expandableListAdapter.notifyAll();
+        //if (expandableListAdapter != null) expandableListAdapter.notifyAll();
     }
 
     public void setTasksByActivity (final long aId) {
@@ -130,6 +278,10 @@ public class UserPage extends AppCompatActivity {
                             tasksByAct.add(new Pair<>(e.id, new ArrayList<Task>()));
                             setTasksByActivity(e.id);
                         }
+                        if (events.size() == 0) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getApplicationContext(), "No events to show", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }   catch (IOException e) {
                     e.printStackTrace();
@@ -163,6 +315,19 @@ public class UserPage extends AppCompatActivity {
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                     Event e = events.get(groupPosition);
 
+                    boolean oneExpanded = false;
+                    ArrayList<Boolean> expList = new ArrayList<>();
+                    for (int i = 0; i < events.size(); i++) {
+                        expList.add(parent.isGroupExpanded(i));
+                    }
+                    expList.set(groupPosition, !expList.get(groupPosition));
+                    for (boolean exp : expList) {
+                        oneExpanded |= exp;
+                    }
+
+                    //if (oneExpanded) fab.setVisibility(View.INVISIBLE);
+                    //else fab.setVisibility(View.VISIBLE);
+
                     //Log.i("name", ((TextView) v.findViewById(R.id.eventNameTextView)).getText().toString());
                     /*((TextView) v.findViewById(R.id.eventIdTextView)).setText(String.valueOf(e.id));
                     (v.findViewById(R.id.eventIdTextView)).setVisibility(View.INVISIBLE);
@@ -177,6 +342,24 @@ public class UserPage extends AppCompatActivity {
                     }*/
 
                     return false;
+                }
+            });
+
+            expandableListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                    int lastItem = firstVisibleItem + visibleItemCount;
+                    if (lastItem == totalItemCount && firstVisibleItem > 0) {
+                        fab.setVisibility(View.INVISIBLE);
+                    }   else {
+                        fab.setVisibility(View.VISIBLE);
+                    }
                 }
             });
         }
@@ -213,122 +396,9 @@ public class UserPage extends AppCompatActivity {
                 });
     }
 
-    public void initialize () {
-        person = null;
-        events = null;
-        persons = new HashMap<>();
-        /*nameTextView = findViewById(R.id.fullNameTextView);
-        emailTextView = findViewById(R.id.emailTextView);
-        numpersTextView = findViewById(R.id.numpersTextView);
-        idTextView = findViewById(R.id.idTextView);*/
 
-        me = getIntent();
-        String user = me.getStringExtra("user");
-        String password = me.getStringExtra("password");
 
-        mapper = new ObjectMapper();
-        PersonServices personServices = new PersonServices();
-        personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
-            @Override
-            public void onSuccessResponse(String response) {
-                try {
-                    personJSON = response;
 
-                    person = mapper.readValue(response, Person.class);
-
-                    //idTextView.setText(String.valueOf(person.id));
-                    //nameTextView.setText(person.firstName + " " + person.lastName);
-                    //emailTextView.setText(person.email);
-                    //numpersTextView.setText(String.valueOf(person.numpers));
-                    Toolbar tb = findViewById(R.id.toolbar);
-                    tb.setTitle(person.firstName + " " + person.lastName);
-                    tb.setSubtitle(person.email);
-                    //setActionBarTitle(nameTextView.getText().toString());
-
-                    if (person != null) {
-                        setActivities();
-                    }
-
-                }   catch (JsonParseException e) {
-                    e.printStackTrace();
-                }   catch (JsonMappingException e) {
-                    e.printStackTrace();
-                }   catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("error", "error response" + error.getMessage());
-                VolleyLog.d("error", "Error: " + error.getMessage());
-            }
-        });
-    }
-
-    private void setActionBarTitle(String s) {
-        this.setTitle(s);
-
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_page);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        initialize();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-                Intent eventAddIntent = new Intent(getApplicationContext(), EventAdd.class);
-                try {
-                    eventAddIntent.putExtra("person", mapper.writeValueAsString(person));
-                }   catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                startActivityForResult(eventAddIntent, eventAddCode);
-            }
-        });
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state);
-        state.putCharSequence("Person", personJSON);
-        state.putCharSequence("Activities", activitiesJSON);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle state) {
-        super.onRestoreInstanceState(state);
-        personJSON = String.valueOf(state.getCharSequence("Person"));
-        activitiesJSON = String.valueOf(state.getCharSequence("Activities"));
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent loginIntent) {
-        super.onActivityResult(requestCode, resultCode, loginIntent);
-        if(requestCode == eventAddCode && resultCode == RESULT_OK) {
-            if (person != null) {
-                initialize();
-            }
-        }
-        if(requestCode == eventDetailCode && resultCode == RESULT_OK) {
-            if (person != null) {
-                initialize();
-            }
-        }
-        if(requestCode == eventAddCode && resultCode == RESULT_CANCELED) {
-
-        }
-    }
 
     public class EventsExpandableListAdapter extends BaseExpandableListAdapter {
 

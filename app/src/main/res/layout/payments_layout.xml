@@ -19,10 +19,14 @@
 
         <ImageButton
             android:id="@+id/paymentDirectionImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
+            android:gravity="center_vertical"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/ic_action_chevron_right_red" />
     </LinearLayout>
 

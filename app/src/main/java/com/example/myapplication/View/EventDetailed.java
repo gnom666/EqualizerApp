@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -62,7 +63,7 @@ public class EventDetailed extends AppCompatActivity {
     LinkedHashMap<Long, Boolean> selected;
     Event event;
     String eventJson;
-    boolean notOwner = false;
+    boolean isOwner = false;
     ArrayList<Payment> payments;
     ArrayList<Task> tasks;
 
@@ -74,6 +75,7 @@ public class EventDetailed extends AppCompatActivity {
     PaymentsListAdapter paymentsListAdapter;
     LinearLayout buttonsLayout;
     HashMap<Long, CheckBox> participantsCheckboxes;
+    AbsListView.OnScrollListener onScrollListener;
 
     Intent me;
     ObjectMapper mapper;
@@ -88,8 +90,11 @@ public class EventDetailed extends AppCompatActivity {
     final int TASKS_POSITION = 0;
     final int PARTICIPANTS_POSITION = 1;
     final int PAYMENTS_POSITION = 2;
+    int POSITION = 0;
     private int eventDetailCode = 10;
     private int taskAddCode = 20;
+    private int taskEditCode = 30;
+    private int taskDeleteCode = 40;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -137,13 +142,32 @@ public class EventDetailed extends AppCompatActivity {
         });
 
 
-        fab = (FloatingActionButton) findViewById(R.id.detailedEventAddTask);
+        fab = findViewById(R.id.detailedEventAddTask);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addTask();
             }
         });
+
+        onScrollListener = new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                Log.i("POSITION", String.valueOf(POSITION));
+                int lastItem = firstVisibleItem + visibleItemCount;
+                if (POSITION != TASKS_POSITION || (lastItem == totalItemCount && firstVisibleItem > 0)) {
+                    fab.setVisibility(View.INVISIBLE);
+                }   else {
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+        };
 
         buttonsLayout = findViewById(R.id.buttonsLinearLayout);
         if (buttonsLayout != null) {
@@ -199,24 +223,25 @@ public class EventDetailed extends AppCompatActivity {
 
     public void tabSelected(TabLayout.Tab tab) {
         int position = tab.getPosition();
-
+        POSITION = position;
         switch (position) {
             case TASKS_POSITION:
-                setFabVisibility(true);
                 setEditLayoutVisibility(false);
                 //setTasksListView();
+                setFabVisibility(true);
                 break;
             case PARTICIPANTS_POSITION:
-                setFabVisibility(false);
-                setEditLayoutVisibility(true);
+                if (isOwner)
+                    setEditLayoutVisibility(true);
                 //setParticipantsListView();
                 if (participantsListAdapter != null)
                     participantsListAdapter.notifyDataSetChanged();
+                setFabVisibility(false);
                 break;
             case PAYMENTS_POSITION:
-                setFabVisibility(false);
                 setEditLayoutVisibility(false);
                 //setTasksListView();
+                setFabVisibility(false);
                 break;
             default:
                 break;
@@ -257,8 +282,8 @@ public class EventDetailed extends AppCompatActivity {
         tb.setTitle(event.name);
         tb.setSubtitle(event.description + " (" + event.date + ")");
 
-        if (person.id != event.owner) {
-            notOwner = true;
+        if (person.id == event.owner) {
+            isOwner = true;
         }
 
         setContactsList(person.id);
@@ -347,9 +372,11 @@ public class EventDetailed extends AppCompatActivity {
                             if (payments != null) {
 
                                 for (Payment p : payments) {
-                                    Person from = (Person ) Utils.byId(participants, p.from, Person.class);
+                                    //Person from = (Person ) Utils.byId(participants, p.from, Person.class);
+                                    Person from = findPerson(participants, p.from);
                                     if (from == null) from = person;
-                                    Person to = (Person) Utils.byId(participants, p.to, Person.class);
+                                    //Person to = (Person) Utils.byId(participants, p.to, Person.class);
+                                    Person to = findPerson(participants, p.to);
                                     if (to == null) to = person;
                                     Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.ammount + " )");
                                 }
@@ -383,7 +410,8 @@ public class EventDetailed extends AppCompatActivity {
                             tasks = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Task.class));
                             if (tasks != null) {
                                 for (Task t : tasks) {
-                                    Person owner = (Person ) Utils.byId(participants, t.owner, Person.class);
+                                    //Person owner = (Person ) Utils.byId(participants, t.owner, Person.class);
+                                    Person owner = findPerson(participants, t.owner);
                                     if (owner == null) owner = person;
                                     Log.i("task", t.name + " by " + owner.lastName);
                                 }
@@ -402,6 +430,45 @@ public class EventDetailed extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
+                    }
+                });
+    }
+
+    public void deleteTask (final long tId) {
+
+        TasksServices tasksServices = new TasksServices();
+
+        tasksServices.deleteTask(this, tId,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            Task task = mapper.readValue(response, Task.class);
+                            if (task != null) {
+                                if (task.error == null) {
+
+                                    Toast.makeText(getApplicationContext(), "Task " + task.name + " deleted", Toast.LENGTH_SHORT).show();
+
+                                    setTasks(event.id, true);
+                                    setPayments(event.id, true);
+
+                                    setResult(RESULT_OK, me);
+                                }   else {
+                                    Toast.makeText(getApplicationContext(), task.error.description, Toast.LENGTH_SHORT).show();
+                                }
+                            }   else {
+                                Toast.makeText(getApplicationContext(), "null Task returned", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -452,6 +519,44 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
+    public void deleteEvent () {
+
+        EventServices eventServices = new EventServices();
+
+        eventServices.deleteActivity(this, event.id,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            Event deletedEvent = mapper.readValue(response, Event.class);
+                            if (deletedEvent != null) {
+                                if (deletedEvent.error == null) {
+
+                                    Toast.makeText(getApplicationContext(), "Event " + deletedEvent.name + " deleted", Toast.LENGTH_SHORT).show();
+
+                                    setResult(RESULT_OK, me);
+                                    finish();
+
+                                }   else {
+                                    Toast.makeText(getApplicationContext(), deletedEvent.error.description, Toast.LENGTH_SHORT).show();
+                                }
+                            }   else {
+                                Toast.makeText(getApplicationContext(), "null Event returned", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -466,7 +571,7 @@ public class EventDetailed extends AppCompatActivity {
 
         switch (id) {
             case R.id.action_edit:
-                if (notOwner) {
+                if (!isOwner) {
                     Toast.makeText(this, R.string.owner_can_edit, Toast.LENGTH_SHORT).show();
                 }   else {
                     editEvent();
@@ -476,7 +581,11 @@ public class EventDetailed extends AppCompatActivity {
                 Toast.makeText(this, "calculate", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_delete:
-                Toast.makeText(this, "delete", Toast.LENGTH_SHORT).show();
+                if (!isOwner) {
+                    Toast.makeText(this, R.string.owner_can_delete, Toast.LENGTH_SHORT).show();
+                }   else {
+                    deleteEvent();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -549,6 +658,26 @@ public class EventDetailed extends AppCompatActivity {
         if(requestCode == taskAddCode && resultCode == RESULT_CANCELED) {
 
         }
+
+        if(requestCode == taskEditCode && resultCode == RESULT_OK) {
+            eventJson = intent.getStringExtra("task");
+            try {
+                Task task = mapper.readValue(eventJson, Task.class);
+                Task toChange = Utils.byId(tasks, task.id, Task.class);
+                toChange = new Task(task);
+            }   catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            setTasks(event.id, true);
+            setPayments(event.id, true);
+
+            setResult(RESULT_OK, me);
+
+        }
+        if(requestCode == taskEditCode && resultCode == RESULT_CANCELED) {
+
+        }
     }
 
 
@@ -556,7 +685,7 @@ public class EventDetailed extends AppCompatActivity {
 
     public void forceBackParticipantsListView () {
 
-        if (originals != null && !notOwner) {
+        if (originals != null && isOwner) {
             Iterator it = selected.keySet().iterator();
             while (it.hasNext()) {
                 selected.put((Long) it.next(), false);
@@ -583,7 +712,7 @@ public class EventDetailed extends AppCompatActivity {
     public void forceParticipantsListView () {
         participantsListView = findViewById(R.id.detailedEventParticipantsListView);
 
-        if (notOwner) {
+        if (!isOwner) {
             participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, participants);
         }   else {
             participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, contacts);
@@ -598,7 +727,7 @@ public class EventDetailed extends AppCompatActivity {
             participantsListView = findViewById(R.id.detailedEventParticipantsListView);
         }
         if (participantsListAdapter == null) {
-            if (notOwner) {
+            if (!isOwner) {
                 participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, participants);
             }   else {
                 participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, contacts);
@@ -640,10 +769,10 @@ public class EventDetailed extends AppCompatActivity {
             if (view == null) {
                 view = layOutInflater.inflate(R.layout.participants_layout, null);
                 CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
-                checkBox.setText(p.firstName + " " + p.lastName);
+                checkBox.setText(p.firstName + " " + p.lastName + " (" + p.numpers + ")");
                 checkBox.setTag(p.id);
                 checkBox.setOnClickListener(listener);
-                if (notOwner) {
+                if (!isOwner) {
                     checkBox.setChecked(true);
                     checkBox.setFocusable(false);
                     checkBox.setClickable(false);
@@ -672,6 +801,8 @@ public class EventDetailed extends AppCompatActivity {
         tasksListAdapter = new TasksListAdapter((Context) mThis, 0, tasks);
         tasksListView.setAdapter(tasksListAdapter);
 
+        tasksListView.setOnScrollListener(onScrollListener);
+
     }
 
     public void setTasksListView () {
@@ -683,6 +814,7 @@ public class EventDetailed extends AppCompatActivity {
             tasksListView.setAdapter(tasksListAdapter);
         }
 
+        tasksListView.setOnScrollListener(onScrollListener);
     }
 
     public class TasksListAdapter extends ArrayAdapter<Task> {
@@ -692,7 +824,7 @@ public class EventDetailed extends AppCompatActivity {
         View.OnClickListener deleteListener;
         View.OnClickListener editListener;
 
-        public TasksListAdapter(@NonNull final Context context, int resource, @NonNull ArrayList<Task> tasks) {
+        public TasksListAdapter(@NonNull final Context context, int resource, @NonNull final ArrayList<Task> tasks) {
             super(context, resource, tasks);
             this.tasks = tasks;
 
@@ -703,14 +835,14 @@ public class EventDetailed extends AppCompatActivity {
             editListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "editing " + String.valueOf((long)view.getTag()), Toast.LENGTH_SHORT).show();
+                    editTask((long) view.getTag());
                 }
             };
 
             deleteListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "deleting " + String.valueOf((long)view.getTag()), Toast.LENGTH_SHORT).show();
+                    deleteTask((long) view.getTag());
                 }
             };
         }
@@ -726,7 +858,7 @@ public class EventDetailed extends AppCompatActivity {
             name.setTag(t.id);
 
             TextView owner = view.findViewById(R.id.taskTabOwnerTextView);
-            Person ownerPerson = (Person ) Utils.byId(participants, t.owner, Person.class);
+            Person ownerPerson = findPerson(participants, t.owner);
             if (ownerPerson == null) ownerPerson = person;
             owner.setText(ownerPerson.firstName + " " + ownerPerson.lastName);
             owner.setTag(ownerPerson.id);
@@ -741,6 +873,11 @@ public class EventDetailed extends AppCompatActivity {
             ImageButton delete = view.findViewById(R.id.taskTabDeleteTabImageButton);
             delete.setOnClickListener(deleteListener);
             delete.setTag(t.id);
+
+            if (!isOwner && t.owner != person.id) {
+                edit.setVisibility(View.INVISIBLE);
+                delete.setVisibility(View.INVISIBLE);
+            }
 
             return view;
         }
@@ -762,7 +899,7 @@ public class EventDetailed extends AppCompatActivity {
 
     public void forcePaymentsListView () {
         paymentsListView = findViewById(R.id.detailedEventPaymentsListView);
-        if (notOwner) {
+        if (!isOwner) {
             paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, reducePayments(payments));
         }   else {
             paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, payments);
@@ -775,7 +912,7 @@ public class EventDetailed extends AppCompatActivity {
             paymentsListView = findViewById(R.id.detailedEventPaymentsListView);
         }
         if (paymentsListAdapter == null) {
-            if (notOwner) {
+            if (!isOwner) {
                 paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, reducePayments(payments));
             }   else {
                 paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, payments);
@@ -819,17 +956,17 @@ public class EventDetailed extends AppCompatActivity {
             TextView amount = view.findViewById(R.id.paymentAmmountTextView);
             ImageButton direction = view.findViewById(R.id.paymentDirectionImageButton);
 
-            if (notOwner) {
+            if (!isOwner) {
                 if (mustPay) {
-                    Person to = (Person) Utils.byId(contacts, p.to, Person.class);
+                    Person to = findPerson(contacts, p.to);
                     if (to == null) {
-                        to = (Person) Utils.byId(participants, p.to, Person.class);
+                        to = findPerson(participants, p.to);
                     }
                     name.setText(to.firstName + " " + to.lastName);
                 }   else {
-                    Person from = (Person) Utils.byId(contacts, p.from, Person.class);
+                    Person from = findPerson(contacts, p.from);
                     if (from == null) {
-                        from = (Person) Utils.byId(participants, p.from, Person.class);
+                        from = findPerson(participants, p.from);
                     }
                     name.setText(from.firstName + " " + from.lastName);
                 }
@@ -847,7 +984,7 @@ public class EventDetailed extends AppCompatActivity {
 
                 direction.setImageResource(R.drawable.ic_action_keyboard_arrow_right);
 
-                Person from = (Person) Utils.byId(participants, p.from, Person.class);
+                Person from = findPerson(participants, p.from);
                 if (from.id == person.id) {
                     direction.setImageResource(R.drawable.ic_action_chevron_right_red);
                     sep = "";
@@ -855,7 +992,7 @@ public class EventDetailed extends AppCompatActivity {
                     text += from.firstName + " " + from.lastName;
                 }
 
-                Person to = (Person) Utils.byId(participants, p.to, Person.class);
+                Person to = findPerson(participants, p.to);
                 if (to.id == person.id) {
                     direction.setImageResource(R.drawable.ic_action_chevron_left_green);
                     sep = "";
@@ -924,4 +1061,20 @@ public class EventDetailed extends AppCompatActivity {
         startActivityForResult(taskAddIntent, taskAddCode);
     }
 
+    public void editTask (long id) {
+        Intent taskEditIntent = new Intent(getApplicationContext(), TaskDetail.class);
+        try {
+            taskEditIntent.putExtra("person", mapper.writeValueAsString(person));
+            taskEditIntent.putExtra("event", mapper.writeValueAsString(event));
+            Task task = Utils.byId(tasks, id, Task.class);
+            taskEditIntent.putExtra("task", mapper.writeValueAsString(task));
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        startActivityForResult(taskEditIntent, taskEditCode);
+    }
+
+    public Person findPerson (ArrayList<Person> list, long id) {
+        return Utils.byId(list, id, Person.class);
+    }
 }

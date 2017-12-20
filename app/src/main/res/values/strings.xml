@@ -23,6 +23,10 @@
     <string name="item_remove">Remove</string>
 
     <string name="owner_can_edit">Only owner can edit</string>
+    <string name="owner_can_calculate">Only owner can calculate</string>
+    <string name="owner_can_delete">Only owner can delete</string>
     <string name="title_activity_task_add">TaskAdd</string>
+    <string name="title_activity_task_detail">TaskDetail</string>
+    <string name="title_activity_contacts">Contacts</string>
 
 </resources>

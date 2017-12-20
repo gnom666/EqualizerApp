@@ -4,12 +4,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "code",
         "type",
         "description",
-        "timestamp"
+        "timeStamp",
+        "status",
+        "message",
+        "trace"
 })
 public class Error {
 
@@ -20,29 +25,45 @@ public class Error {
     @JsonProperty
     public String description;
     @JsonProperty
-    public String timestamp;
+    public Integer status;
+    @JsonProperty
+    public String error;
+    @JsonProperty
+    public String message;
+    @JsonProperty
+    public String timeStamp;
+    @JsonProperty
+    public String trace;
 
-    public Error(Error error) {
-        this.code = error.code;
-        this.type = error.type;
-        this.description = error.description;
-        this.timestamp = error.timestamp;
+    public Error(Error er) {
+        this.code = er.code;
+        this.type = er.type;
+        this.description = er.description;
+        this.timeStamp = er.timeStamp;
+        this.status = er.status;
+        this.error = er.error;
+        this.message = er.message;
+        this.trace = er.trace;
     }
 
     public Error() {
         this.code = Constants.ErrorCode.UNKNOWN;
         this.type = Constants.ErrorType.UNKNOWN;
         this.description = "";
-        this.timestamp = "";
+        this.timeStamp = "";
+    }
+
+    public Error(int status, Map<String, Object> errorAttributes) {
+        this.status = status;
+        this.error = (String) errorAttributes.get("error");
+        this.message = (String) errorAttributes.get("message");
+        this.timeStamp = errorAttributes.get("timestamp").toString();
+        this.trace = (String) errorAttributes.get("trace");
     }
 
     @Override
     public String toString() {
-        return "Error{" +
-                "code=" + code +
-                ", type=" + type +
-                ", description='" + description + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                '}';
+        return "Error [code=" + code + ", type=" + type + ", description=" + description + ", status=" + status
+                + ", error=" + error + ", message=" + message + ", timeStamp=" + timeStamp + ", trace=" + trace + "]";
     }
 }

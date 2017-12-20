@@ -32,8 +32,6 @@ import java.util.List;
 public class Person extends Entity {
 
     @JsonProperty
-    public long id;
-    @JsonProperty
     public List<Long> owns;
     @JsonProperty
     public List<Long> activities;
@@ -68,7 +66,6 @@ public class Person extends Entity {
                      List<Long> received, String firstName, String lastName, String modified, String email,
                      String password, int numpers, boolean enabled, Error error) {
         super.id = id;
-        this.id = id;
         this.owns = owns;
         this.activities = activities;
         this.tasks = tasks;
@@ -86,7 +83,6 @@ public class Person extends Entity {
 
     public Person() {
         super.id = 0;
-        this.id = 0;
         this.owns = new ArrayList<>();
         this.activities = new ArrayList<>();
         this.tasks = new ArrayList<>();
