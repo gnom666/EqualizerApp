@@ -46,7 +46,8 @@ public class EventDetail extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.eventDetailToolbar);
+        toolbar.setTitle("Edit Event");
         setSupportActionBar(toolbar);
 
         init ();

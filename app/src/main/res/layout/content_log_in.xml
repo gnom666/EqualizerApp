@@ -70,13 +70,13 @@
 
             <Button
                 android:id="@+id/logButton"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@android:color/holo_green_light"
                 android:onClick="loginClick"
                 android:padding="16dp"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:backgroundTint="@android:color/holo_blue_light"
                 android:text="Log In" />
         </LinearLayout>
 

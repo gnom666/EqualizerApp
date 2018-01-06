@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="First Name"
-                android:inputType="textPersonName"
+                android:inputType="textCapWords"
                 android:padding="16dp" />
 
             <EditText
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Last Name"
-                android:inputType="textPersonName"
+                android:inputType="textCapWords"
                 android:padding="16dp" />
 
             <EditText
@@ -99,12 +99,12 @@
 
             <Button
                 android:id="@+id/okButton"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@android:color/holo_green_light"
                 android:onClick="okClick"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:backgroundTint="@android:color/holo_blue_light"
                 android:text="Ok" />
 
         </LinearLayout>

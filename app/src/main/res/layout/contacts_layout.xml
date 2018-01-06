@@ -6,37 +6,39 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="false"
+    android:columnCount="6"
     android:focusable="false"
     android:focusableInTouchMode="false"
     android:orientation="horizontal"
-    android:columnCount="6"
+    android:paddingBottom="8dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="8dp">
 
       <TextView
           android:id="@+id/contactNameTextView"
+          style="@android:style/Widget.TextView.PopupMenu"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_column="2"
+          android:layout_row="0"
           android:layout_weight="1"
           android:text="TextView"
-          android:textAppearance="@style/TextAppearance.AppCompat.Title"
-          android:textSize="18sp"
-          android:layout_column="2"
-          android:layout_row="0"/>
+          android:textAppearance="@style/TextAppearance.AppCompat.Large"
+          android:textSize="20sp" />
 
       <ImageButton
           android:id="@+id/contactDeleteImageButton"
-          android:layout_width="24dp"
-          android:layout_height="24dp"
-          android:layout_marginBottom="8dp"
+          android:layout_width="28dp"
+          android:layout_height="28dp"
+          android:layout_column="5"
           android:layout_marginLeft="0dp"
           android:layout_marginRight="2dp"
+          android:layout_marginTop="1dp"
+          android:layout_row="0"
           android:layout_weight="1"
           android:background="@android:color/transparent"
           android:scaleType="fitCenter"
-          app:srcCompat="@drawable/ic_action_delete_dark"
-          android:layout_column="5"
-          android:layout_row="0"/>
+          app:srcCompat="@drawable/delete_2" />
 
 </GridLayout>

@@ -19,15 +19,15 @@
 
         <ImageButton
             android:id="@+id/paymentDirectionImageButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="8dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="6dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
             android:gravity="center_vertical"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_action_chevron_right_red" />
+            app:srcCompat="@drawable/right_shadow_red" />
     </LinearLayout>
 
     <LinearLayout
@@ -56,6 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingLeft="2dp"
                 android:text="TextView" />
 
             <TextView
@@ -69,7 +70,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/paymentAmmountTextView"
+        android:id="@+id/paymentAmountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_column="3"

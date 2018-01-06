@@ -31,7 +31,8 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark">
+            android:background="@android:color/holo_blue_dark"
+            app:tabIndicatorColor="@android:color/holo_green_light">
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabTasks"
@@ -94,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="@android:color/holo_blue_light"
+            android:backgroundTint="@android:color/holo_green_light"
             android:onClick="onOkClick"
             android:text="Ok" />
     </LinearLayout>
@@ -105,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="4dp"
-        app:backgroundTint="@android:color/holo_blue_light"
-        app:srcCompat="@drawable/ic_action_add" />
+        app:backgroundTint="@android:color/holo_green_light"
+        app:srcCompat="@drawable/add" />
 
 </android.support.design.widget.CoordinatorLayout>

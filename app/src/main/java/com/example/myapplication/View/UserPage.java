@@ -2,6 +2,7 @@ package com.example.myapplication.View;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,10 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UserPage extends AppCompatActivity {
-    /*TextView nameTextView;
-    TextView emailTextView;
-    TextView numpersTextView;
-    TextView idTextView;*/
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
@@ -60,6 +57,7 @@ public class UserPage extends AppCompatActivity {
     ObjectMapper mapper;
     FloatingActionButton fab;
     FloatingActionButton fabContacts;
+    CountDownTimer timer;
 
     String personJSON;
     String activitiesJSON;
@@ -67,7 +65,9 @@ public class UserPage extends AppCompatActivity {
     private int eventDetailCode = 50;
     private int contactsCode = 60;
 
-
+    PersonServices personServices;
+    VolleyCallback vc = null;
+    Response.ErrorListener el = null;
 
 
     @Override
@@ -76,6 +76,8 @@ public class UserPage extends AppCompatActivity {
         setContentView(R.layout.activity_user_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        personServices = new PersonServices();
 
         initialize();
 
@@ -108,7 +110,7 @@ public class UserPage extends AppCompatActivity {
         });
     }
 
-    @Override
+    /*@Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         state.putCharSequence("Person", personJSON);
@@ -121,7 +123,7 @@ public class UserPage extends AppCompatActivity {
         personJSON = String.valueOf(state.getCharSequence("Person"));
         activitiesJSON = String.valueOf(state.getCharSequence("Activities"));
 
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent loginIntent) {
@@ -152,8 +154,6 @@ public class UserPage extends AppCompatActivity {
 
 
     public void initialize () {
-        person = null;
-        events = null;
         persons = new HashMap<>();
         /*nameTextView = findViewById(R.id.fullNameTextView);
         emailTextView = findViewById(R.id.emailTextView);
@@ -169,10 +169,10 @@ public class UserPage extends AppCompatActivity {
         //progressBar.animate();
 
         mapper = new ObjectMapper();
-        PersonServices personServices = new PersonServices();
-        personServices.userByEmailAndPass(this, user, password, new VolleyCallback() {
+
+        vc = new VolleyCallback() {
             @Override
-            public void onSuccessResponse(String response) {
+            public void onSuccessResponse(String response) throws IOException {
                 try {
                     personJSON = response;
 
@@ -199,13 +199,20 @@ public class UserPage extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
+        };
+
+        el = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("error", "error response" + error.getMessage());
                 VolleyLog.d("error", "Error: " + error.getMessage());
             }
-        });
+        };
+
+        if (personServices == null)
+            personServices = new PersonServices();
+
+        personServices.userByEmailAndPass(this, user, password, vc, el);
     }
 
 
@@ -313,34 +320,6 @@ public class UserPage extends AppCompatActivity {
             expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                    Event e = events.get(groupPosition);
-
-                    boolean oneExpanded = false;
-                    ArrayList<Boolean> expList = new ArrayList<>();
-                    for (int i = 0; i < events.size(); i++) {
-                        expList.add(parent.isGroupExpanded(i));
-                    }
-                    expList.set(groupPosition, !expList.get(groupPosition));
-                    for (boolean exp : expList) {
-                        oneExpanded |= exp;
-                    }
-
-                    //if (oneExpanded) fab.setVisibility(View.INVISIBLE);
-                    //else fab.setVisibility(View.VISIBLE);
-
-                    //Log.i("name", ((TextView) v.findViewById(R.id.eventNameTextView)).getText().toString());
-                    /*((TextView) v.findViewById(R.id.eventIdTextView)).setText(String.valueOf(e.id));
-                    (v.findViewById(R.id.eventIdTextView)).setVisibility(View.INVISIBLE);
-                    ((TextView) v.findViewById(R.id.eventDateTextView)).setText(e.date);
-                    ((TextView) v.findViewById(R.id.eventDescriptionTextView)).setText(e.description);
-                    (v.findViewById(R.id.eventInfoImageButton)).setFocusable(false);*/
-
-                    /*if (parent.isGroupExpanded(groupPosition)) {
-                        parent.collapseGroup(groupPosition);
-                    }   else {
-                        parent.expandGroup(groupPosition);
-                    }*/
-
                     return false;
                 }
             });
@@ -348,22 +327,53 @@ public class UserPage extends AppCompatActivity {
             expandableListView.setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+                    if (scrollState == 1) {
+                        fabsVisibility(false);
+                    }   else {
+                        startTimer(2000);
+                    }
                 }
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                    int lastItem = firstVisibleItem + visibleItemCount;
-                    if (lastItem == totalItemCount && firstVisibleItem > 0) {
-                        fab.setVisibility(View.INVISIBLE);
+                    /*int lastItem = firstVisibleItem + visibleItemCount;
+                    if (lastItem <= totalItemCount-1 && firstVisibleItem > 0) {
+                        fabsVisibility(false);
                     }   else {
-                        fab.setVisibility(View.VISIBLE);
-                    }
+                        fabsVisibility(true);
+                    }*/
                 }
             });
         }
     }
+
+    public void fabsVisibility (boolean visibility) {
+        if (!visibility) {
+            fab.setVisibility(View.INVISIBLE);
+            fabContacts.setVisibility(View.INVISIBLE);
+        }   else {
+            fab.setVisibility(View.VISIBLE);
+            fabContacts.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void startTimer(long time){
+        if (timer != null)
+            timer.cancel();
+
+        timer = new CountDownTimer(time, time){
+            public void onTick(long millisUntilDone){
+
+            }
+
+            public void onFinish() {
+                fabsVisibility(true);
+                cancel();
+            }
+        }.start();
+    }
+
 
     public void setPersons (final long pId) {
         PersonServices personServices = new PersonServices();
@@ -427,6 +437,10 @@ public class UserPage extends AppCompatActivity {
                     Event eventClicked = getEventById(id);
                     if (eventClicked != null) {
                         //Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetail.class);
+                        for (int i = 0; i < expandableListAdapter.getGroupCount(); i++) {
+                            expandableListView.collapseGroup(i);
+                        }
+
                         Intent eventDetailIntent = new Intent(getApplicationContext(), EventDetailed.class);
                         try {
                             eventDetailIntent.putExtra("person", mapper.writeValueAsString(person));
@@ -538,7 +552,7 @@ public class UserPage extends AppCompatActivity {
             ((TextView) view.findViewById(R.id.taskIdTextView)).setText(String.valueOf(t.id));
             (view.findViewById(R.id.taskIdTextView)).setVisibility(View.INVISIBLE);
             ((TextView) view.findViewById(R.id.taskOwnerTextView)).setText(persons.get(t.owner).firstName + " " + persons.get(t.owner).lastName);
-            ((TextView) view.findViewById(R.id.taskAmmountTextView)).setText(Utils.amount2string(t.ammount));
+            ((TextView) view.findViewById(R.id.taskAmountTextView)).setText(Utils.amount2string(t.amount));
             view.setTag(t.id);
 
             return view;

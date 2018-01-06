@@ -44,7 +44,8 @@ public class TaskAdd extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_add);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.taskAddToolbar);
+        toolbar.setTitle("Add Task");
         setSupportActionBar(toolbar);
 
         me = getIntent();
@@ -89,9 +90,9 @@ public class TaskAdd extends AppCompatActivity {
         newTask.name = name.getText().toString();
         newTask.description = description.getText().toString();
         try {
-            newTask.ammount = Double.valueOf(amount.getText().toString());
+            newTask.amount = Double.valueOf(amount.getText().toString());
         }   catch (Exception e) {
-            newTask.ammount = 0;
+            newTask.amount = 0;
             Toast.makeText(getApplicationContext(), "Wrong amount", Toast.LENGTH_SHORT);
             return;
         }

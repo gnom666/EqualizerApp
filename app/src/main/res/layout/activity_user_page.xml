@@ -26,10 +26,12 @@
         android:id="@+id/userPageProgressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="73dp"
         android:layout_margin="64dp"
         android:layout_weight="1"
         android:indeterminate="true"
+        android:indeterminateTint="@android:color/holo_blue_dark"
+        android:indeterminateTintMode="src_in"
         tools:layout_editor_absoluteY="103dp" />
 
     <android.support.design.widget.FloatingActionButton
@@ -40,15 +42,15 @@
         android:layout_margin="4dp"
         android:clickable="true"
         android:tint="@android:color/background_light"
-        app:backgroundTint="@android:color/holo_blue_light"
+        app:backgroundTint="@android:color/holo_green_light"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
         app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/ic_action_add" />
+        app:srcCompat="@drawable/add" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabContacts"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        style="@style/Widget.Design.FloatingActionButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
@@ -58,7 +60,7 @@
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="left|bottom"
         app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/ic_action_account_circle" />
+        app:srcCompat="@drawable/contact" />
 
     <include
         android:id="@+id/include"

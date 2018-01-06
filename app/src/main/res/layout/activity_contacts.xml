@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="4dp"
-        app:backgroundTint="@android:color/holo_blue_light"
-        app:srcCompat="@drawable/ic_action_add" />
+        app:backgroundTint="@android:color/holo_green_light"
+        app:srcCompat="@drawable/add" />
 
 
 </android.support.design.widget.CoordinatorLayout>

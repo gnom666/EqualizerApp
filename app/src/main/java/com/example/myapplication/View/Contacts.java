@@ -1,18 +1,24 @@
 package com.example.myapplication.View;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,10 +26,13 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.VolleyCallback;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -34,6 +43,7 @@ public class Contacts extends AppCompatActivity {
     Person person;
     String personJson;
     ArrayList<Person> contacts;
+    String addEmail;
 
     Intent me;
     ObjectMapper mapper;
@@ -43,6 +53,10 @@ public class Contacts extends AppCompatActivity {
     ListView contactsListView;
     ContactsListAdapter contactsListAdapter;
     Object mThis;
+    Dialog addContactDialog;
+    AlertDialog.Builder addContactDialogBuilder;
+    AlertDialog addContactAlertDialog;
+    CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,32 +69,187 @@ public class Contacts extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showContactDialog();
             }
         });
 
         onScrollListener = new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-
+                if (scrollState == 1) {
+                    fab.setVisibility(View.INVISIBLE);
+                }   else {
+                    startTimer(2000);
+                }
             }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                int lastItem = firstVisibleItem + visibleItemCount;
-                if (lastItem == totalItemCount && firstVisibleItem > 0) {
-                    fab.setVisibility(View.INVISIBLE);
-                }   else {
-                    fab.setVisibility(View.VISIBLE);
-                }
             }
         };
 
-        init();
+        init ();
+
     }
 
+    private void startTimer(long time){
+        if (timer != null)
+            timer.cancel();
+
+        timer = new CountDownTimer(time, time){
+            public void onTick(long millisUntilDone){
+
+            }
+
+            public void onFinish() {
+                fab.setVisibility(View.VISIBLE);
+            }
+        }.start();
+    }
+
+    private void showContactDialog() {
+
+        LayoutInflater li = LayoutInflater.from(getApplicationContext());
+        View addContactView = li.inflate(R.layout.contact_add_layout, null);
+
+        EditText email = addContactView.findViewById(R.id.contactEmailEditText);
+        email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        Button dialogCancelButton = addContactView.findViewById(R.id.genericCancelButton);
+        dialogCancelButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                //addContactDialog.dismiss();
+                addContactAlertDialog.cancel();
+            }
+        });
+
+        Button dialogAddButton = addContactView.findViewById(R.id.genericAddlButton);
+        dialogAddButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                EditText email = addContactAlertDialog.findViewById(R.id.contactEmailEditText);
+                //EditText email = addContactDialog.findViewById(R.id.contactEmailEditText);
+
+                addEmail = email.getText().toString().trim();
+                if (email != null && !addEmail.isEmpty()){
+                    addContact();
+                }
+            }
+        });
+
+        addContactDialogBuilder = new AlertDialog.Builder((Context)mThis);
+        addContactDialogBuilder.setView(addContactView);
+        addContactDialogBuilder.setCancelable(false);
+        addContactDialogBuilder.setTitle("Contact email");
+
+        addContactAlertDialog = addContactDialogBuilder.create();
+        addContactAlertDialog.show();
+
+        /*addContactDialog = new Dialog((Context) mThis);
+        addContactDialog.setContentView(addContactView);
+        addContactDialog.show();*/
+
+
+    }
+
+    private void addContact() {
+        PersonServices personServices = new PersonServices();
+        personServices.setFriendByEmail(this, person.id, addEmail,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            Person newPerson = mapper.readValue(response, Person.class);
+
+                            if (newPerson != null) {
+                                if (newPerson.error == null) {
+
+                                    setContactsList(person.id, true);
+
+                                    addContactAlertDialog.cancel();
+                                    //addContactDialog.dismiss();
+
+                                }   else {
+                                    Toast.makeText(getBaseContext(), newPerson.error.description, Toast.LENGTH_SHORT).show();
+                                }
+
+                            }   else {
+                                Toast.makeText(getBaseContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (JsonParseException e) {
+                            e.printStackTrace();
+                        }   catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
+                        Log.e("error", "error response: " + error.getMessage());
+                        VolleyLog.d("error", "Error: " + error.getMessage());
+                    }
+                });
+    }
+
+
+    private void removeContact(long toUnset) {
+        PersonServices personServices = new PersonServices();
+        personServices.unsetFriends(this, person.id, toUnset,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            ArrayList<Person> result = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Person.class));
+
+                            if (result != null && result.size() == 2) {
+                                if (result.get(0).error == null && result.get(1).error == null) {
+
+                                    setContactsList(person.id, true);
+
+                                    Toast.makeText(getBaseContext(), result.get(1).lastName + " unset as contact", Toast.LENGTH_SHORT).show();
+
+                                }   else {
+                                    if (result.get(0).error != null) {
+                                        Toast.makeText(getBaseContext(), result.get(0).error.description, Toast.LENGTH_SHORT).show();
+                                    }
+                                    if (result.get(1).error != null) {
+                                        Toast.makeText(getBaseContext(), result.get(0).error.description, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                            }   else {
+                                Toast.makeText(getBaseContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (JsonParseException e) {
+                            e.printStackTrace();
+                        }   catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
+                        Log.e("error", "error response: " + error.getMessage());
+                        VolleyLog.d("error", "Error: " + error.getMessage());
+                    }
+                });
+    }
 
 
     private void init() {
@@ -104,12 +273,12 @@ public class Contacts extends AppCompatActivity {
         tb.setTitle("Contacts");
         tb.setSubtitle(person.firstName + " " + person.lastName);
 
-        setContactsList(person.id);
+        setContactsList(person.id, false);
     }
 
 
 
-    public void setContactsList (final long pId) {
+    public void setContactsList (final long pId, final boolean force) {
         PersonServices personServices = new PersonServices();
 
         personServices.contacts(this, pId,
@@ -120,7 +289,8 @@ public class Contacts extends AppCompatActivity {
                             contacts = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Person.class));
                             if (contacts != null) {
 
-                                setContactsListView();
+                                if (!force) setContactsListView();
+                                else forceContactsListView();
 
                             }
                         }   catch (IOException e) {
@@ -137,11 +307,13 @@ public class Contacts extends AppCompatActivity {
     }
 
     public void forceContactsListView () {
-        contactsListView = findViewById(R.id.detailedEventParticipantsListView);
+        contactsListView = findViewById(R.id.contactsListView);
 
         contactsListAdapter = new ContactsListAdapter((Context) mThis, 0, contacts);
 
         contactsListView.setAdapter(contactsListAdapter);
+
+        contactsListView.setOnScrollListener(onScrollListener);
     }
 
     public void setContactsListView () {
@@ -151,6 +323,7 @@ public class Contacts extends AppCompatActivity {
         if (contactsListAdapter == null) {
             contactsListAdapter = new ContactsListAdapter((Context) mThis, 0, contacts);
             contactsListView.setAdapter(contactsListAdapter);
+            contactsListView.setOnScrollListener(onScrollListener);
         }
     }
 
@@ -168,7 +341,8 @@ public class Contacts extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     long pId = (long)((ImageButton) view).getTag();
-                    Toast.makeText(getApplicationContext(), "deleting user with id: " + pId, Toast.LENGTH_SHORT).show();
+
+                    removeContact(pId);
                 }
             };
         }
@@ -190,5 +364,7 @@ public class Contacts extends AppCompatActivity {
         }
 
     }
+
+
 
 }

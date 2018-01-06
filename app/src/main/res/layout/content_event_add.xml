@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Name"
-            android:inputType="textPersonName"
+            android:inputType="textCapSentences"
             android:text="Birthday" />
 
         <EditText
@@ -39,17 +39,35 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Description"
-            android:inputType="textPersonName"
+            android:inputType="textCapSentences"
             android:text="My birthday" />
 
-        <EditText
-            android:id="@+id/addEventDateEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Date yyyy-MM-dd"
-            android:inputType="date"
-            android:text="2017-12-13" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/addEventDateEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="yyyy-MM-dd"
+                android:inputType="date"
+                android:text="2017-12-13" />
+
+            <EditText
+                android:id="@+id/addEventTimeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="00:00:00"
+                android:inputType="time"
+                android:text="00:00:00" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView"
@@ -60,7 +78,9 @@
         <ListView
             android:id="@+id/addEventParticipantsListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
 
     </LinearLayout>
 
@@ -88,12 +108,12 @@
 
         <Button
             android:id="@+id/addEventOkButton"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:backgroundTint="@android:color/holo_green_light"
             android:onClick="onOkClick"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:backgroundTint="@android:color/holo_blue_light"
             android:text="Ok" />
     </LinearLayout>
 

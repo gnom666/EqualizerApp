@@ -106,7 +106,47 @@ public class LogIn extends AppCompatActivity {
                 userEditText.setText(user);
                 passwordEditText.setText(password);
             }
+            sendMail(user, password);
         }
+    }
+
+    private void sendMail(String user, String password) {
+        PersonServices personServices = new PersonServices();
+        personServices.sendMail(this, user,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            Person person = mapper.readValue(response, Person.class);
+
+                            if (person != null) {
+                                if (person.error != null) {
+                                    Toast.makeText(getBaseContext(), person.error.description, Toast.LENGTH_SHORT).show();
+                                }   else {
+                                    Toast.makeText(getBaseContext(), "Check your mail to activate", Toast.LENGTH_SHORT).show();
+                                }
+                            }   else {
+                                Toast.makeText(getBaseContext(), "Unknown User", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }   catch (JsonParseException e) {
+                            e.printStackTrace();
+                        }   catch (JsonMappingException e) {
+                            e.printStackTrace();
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getBaseContext(), "Check your mail", Toast.LENGTH_SHORT).show();
+                        Log.e("error", "error response: " + error.getMessage());
+                        VolleyLog.d("error", "Error: " + error.getMessage());
+                    }
+                });
     }
 
 }

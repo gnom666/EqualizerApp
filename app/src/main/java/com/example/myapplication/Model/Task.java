@@ -9,6 +9,8 @@ public class Task extends Entity {
     @JsonProperty
     public long activity;
     @JsonProperty
+    public long attachment;
+    @JsonProperty
     public String name;
     @JsonProperty
     public String modified;
@@ -17,20 +19,21 @@ public class Task extends Entity {
     @JsonProperty
     public boolean calculated;
     @JsonProperty
-    public double ammount;
+    public double amount;
     @JsonProperty
     public Error error;
 
-    public Task(long id, long owner, long activity, String name, String modified, String description,
-                   boolean calculated,	double ammount, Error error) {
+    public Task(long id, long owner, long activity, long attachment, String name, String modified, String description,
+                   boolean calculated,	double amount, Error error) {
         super(id);
         this.owner = owner;
         this.activity = activity;
+        this.attachment = attachment;
         this.name = name;
         this.modified = modified;
         this.description = description;
         this.calculated = calculated;
-        this.ammount = ammount;
+        this.amount = amount;
         this.error = error;
     }
 
@@ -39,11 +42,12 @@ public class Task extends Entity {
         if (task != null) {
             this.owner = task.owner;
             this.activity = task.activity;
+            this.attachment = task.attachment;
             this.name = task.name;
             this.modified = task.modified;
             this.description = task.description;
             this.calculated = task.calculated;
-            this.ammount = task.ammount;
+            this.amount = task.amount;
             this.error = task.error;
         }
     }
@@ -52,11 +56,12 @@ public class Task extends Entity {
         super(0);
         this.owner = 0;
         this.activity = 0;
+        this.attachment = 0;
         this.name = "";
         this.modified = "";
         this.description = "";
         this.calculated = false;
-        this.ammount = 0.0;
+        this.amount = 0.0;
         this.error = null;
     }
 
@@ -66,11 +71,12 @@ public class Task extends Entity {
                 "id=" + id +
                 ", owner=" + owner +
                 ", activity=" + activity +
+                ", attachment=" + attachment +
                 ", name='" + name + '\'' +
                 ", modified='" + modified + '\'' +
                 ", description='" + description + '\'' +
                 ", calculated=" + calculated +
-                ", ammount=" + ammount +
+                ", amount=" + amount +
                 ", error=" + error +
                 '}';
     }

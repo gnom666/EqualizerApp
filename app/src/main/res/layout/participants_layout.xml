@@ -20,6 +20,8 @@
        android:layout_margin="8dp"
        android:layout_weight="1"
 
+       android:buttonTint="@android:color/holo_blue_light"
+       android:buttonTintMode="src_in"
        android:checked="false"
        android:focusable="false"
        android:focusableInTouchMode="false"

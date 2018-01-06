@@ -16,7 +16,9 @@
         <ListView
             android:id="@+id/contactsListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="2dp"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

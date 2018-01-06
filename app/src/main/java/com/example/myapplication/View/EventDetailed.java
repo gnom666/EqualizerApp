@@ -3,6 +3,7 @@ package com.example.myapplication.View;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -76,11 +77,13 @@ public class EventDetailed extends AppCompatActivity {
     LinearLayout buttonsLayout;
     HashMap<Long, CheckBox> participantsCheckboxes;
     AbsListView.OnScrollListener onScrollListener;
+    AbsListView.OnScrollListener onScrollParticipantsListener;
 
     Intent me;
     ObjectMapper mapper;
     Object mThis;
     FloatingActionButton fab;
+    CountDownTimer timer;
 
     TabTasks tabTasks;
     TabParticipants tabParticipants;
@@ -153,7 +156,34 @@ public class EventDetailed extends AppCompatActivity {
         onScrollListener = new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == 1) {
+                    fab.setVisibility(View.INVISIBLE);
+                }   else {
+                    startFabsTimer(2000);
+                }
+            }
 
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                Log.i("POSITION", String.valueOf(POSITION));
+                int lastItem = firstVisibleItem + visibleItemCount;
+                if (POSITION != TASKS_POSITION || (lastItem == totalItemCount && firstVisibleItem > 0)) {
+                    fab.setVisibility(View.INVISIBLE);
+                }   else {
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+        };
+
+        onScrollParticipantsListener = new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == 1) {
+                    setEditLayoutVisibility(false);
+                }   else {
+                    startButtonsTimer(2000);
+                }
             }
 
             @Override
@@ -177,6 +207,38 @@ public class EventDetailed extends AppCompatActivity {
 
         init ();
 
+    }
+
+    private void startFabsTimer(long time){
+        if (timer != null)
+            timer.cancel();
+
+        timer = new CountDownTimer(time, time){
+            public void onTick(long millisUntilDone){
+
+            }
+
+            public void onFinish() {
+                if (POSITION == TASKS_POSITION)
+                    fab.setVisibility(View.VISIBLE);
+            }
+        }.start();
+    }
+
+    private void startButtonsTimer(long time){
+        if (timer != null)
+            timer.cancel();
+
+        timer = new CountDownTimer(time, time){
+            public void onTick(long millisUntilDone){
+
+            }
+
+            public void onFinish() {
+                if (POSITION == PARTICIPANTS_POSITION)
+                    setEditLayoutVisibility(true);
+            }
+        }.start();
     }
 
     /**
@@ -378,7 +440,7 @@ public class EventDetailed extends AppCompatActivity {
                                     //Person to = (Person) Utils.byId(participants, p.to, Person.class);
                                     Person to = findPerson(participants, p.to);
                                     if (to == null) to = person;
-                                    Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.ammount + " )");
+                                    Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.amount + " )");
                                 }
 
                                 if (!force) setPaymentsListView();
@@ -719,7 +781,7 @@ public class EventDetailed extends AppCompatActivity {
         }
         participantsListView.setAdapter(participantsListAdapter);
 
-
+        participantsListView.setOnScrollListener(onScrollParticipantsListener);
     }
 
     public void setParticipantsListView () {
@@ -735,6 +797,7 @@ public class EventDetailed extends AppCompatActivity {
             participantsListView.setAdapter(participantsListAdapter);
         }
 
+        participantsListView.setOnScrollListener(onScrollParticipantsListener);
     }
 
     public class ParticipantsListAdapter extends ArrayAdapter<Person> {
@@ -863,8 +926,8 @@ public class EventDetailed extends AppCompatActivity {
             owner.setText(ownerPerson.firstName + " " + ownerPerson.lastName);
             owner.setTag(ownerPerson.id);
 
-            TextView amount = view.findViewById(R.id.taskTabAmmountTextView);
-            amount.setText(Utils.amount2string(t.ammount));
+            TextView amount = view.findViewById(R.id.taskTabAmountTextView);
+            amount.setText(Utils.amount2string(t.amount));
 
             ImageButton edit = view.findViewById(R.id.taskTabEditTabImageButton);
             edit.setOnClickListener(editListener);
@@ -953,7 +1016,7 @@ public class EventDetailed extends AppCompatActivity {
 
             TextView name = view.findViewById(R.id.paymentNameTextView);
             TextView status = view.findViewById(R.id.paymentStatusTextView);
-            TextView amount = view.findViewById(R.id.paymentAmmountTextView);
+            TextView amount = view.findViewById(R.id.paymentAmountTextView);
             ImageButton direction = view.findViewById(R.id.paymentDirectionImageButton);
 
             if (!isOwner) {
@@ -973,20 +1036,20 @@ public class EventDetailed extends AppCompatActivity {
 
                 status.setText(p.status.toString());
 
-                amount.setText(Utils.amount2string(p.ammount));
+                amount.setText(Utils.amount2string(p.amount));
 
                 if (!mustPay) {
-                    direction.setImageResource(R.drawable.ic_action_chevron_left_green);
+                    direction.setImageResource(R.drawable.left_shadow_green);
                 }
             }   else {
                 String text = "";
                 String sep = " - ";
 
-                direction.setImageResource(R.drawable.ic_action_keyboard_arrow_right);
+                direction.setImageResource(R.drawable.right_shadow_blue);
 
                 Person from = findPerson(participants, p.from);
                 if (from.id == person.id) {
-                    direction.setImageResource(R.drawable.ic_action_chevron_right_red);
+                    direction.setImageResource(R.drawable.right_shadow_red);
                     sep = "";
                 }   else {
                     text += from.firstName + " " + from.lastName;
@@ -994,7 +1057,7 @@ public class EventDetailed extends AppCompatActivity {
 
                 Person to = findPerson(participants, p.to);
                 if (to.id == person.id) {
-                    direction.setImageResource(R.drawable.ic_action_chevron_left_green);
+                    direction.setImageResource(R.drawable.left_shadow_green );
                     sep = "";
                 }   else {
                     text += sep + to.firstName + " " + to.lastName;
@@ -1004,7 +1067,7 @@ public class EventDetailed extends AppCompatActivity {
 
                 status.setText(p.status.toString());
 
-                amount.setText(Utils.amount2string(p.ammount));
+                amount.setText(Utils.amount2string(p.amount));
 
             }
 

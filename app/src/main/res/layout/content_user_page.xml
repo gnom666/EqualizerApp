@@ -28,11 +28,18 @@
                 android:id="@+id/eventsExpandableListView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:childDivider="@null"
                 android:choiceMode="singleChoice"
                 android:clickable="true"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:contextClickable="true" />
+                android:contextClickable="true"
+                android:divider="@null"
+                android:dividerHeight="6dp"
+                android:importantForAutofill="auto">
+
+            </ExpandableListView>
+
         </LinearLayout>
 
     </LinearLayout>

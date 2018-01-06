@@ -30,6 +30,13 @@ public class PersonServices {
         GenericServices.callService(context, Request.Method.GET, URL, null, null, callback, errorListener);
     }
 
+    public void unsetFriends (android.content.Context context, long person1Id, long person2Id, VolleyCallback callback, final Response.ErrorListener errorListener) {
+
+        String URL = Constants.URL_UnsetFriends + "?person1Id=" + person1Id + "&person2Id=" + person2Id;
+
+        GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
+
     public void userByEmailAndPass (android.content.Context context, String user, String password, final VolleyCallback callback, final Response.ErrorListener errorListener) {
 
         String URL = Constants.URL_CheckUserAndPass + "?uName=" + user + "&uPass=" + password;
@@ -63,6 +70,13 @@ public class PersonServices {
         String URL = Constants.URL_AddPerson;
 
         GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
+    }
+
+    public void sendMail (android.content.Context context, String user, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+
+        String URL = Constants.URL_SendMail + "?user=" + user;
+
+        GenericServices.callService(context, Request.Method.GET, URL, null, null, callback, errorListener);
     }
 
     public void modifyPerson (android.content.Context context, String paramName, JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {

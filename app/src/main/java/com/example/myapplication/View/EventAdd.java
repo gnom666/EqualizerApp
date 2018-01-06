@@ -56,7 +56,8 @@ public class EventAdd extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_add);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.eventAddToolbar);
+        toolbar.setTitle("Add Event");
         setSupportActionBar(toolbar);
 
         persons = new ArrayList<>();
@@ -77,6 +78,8 @@ public class EventAdd extends AppCompatActivity {
         name = findViewById(R.id.addEventNameEditText);
         description = findViewById(R.id.addEventDescriptionEditText);
         date = findViewById(R.id.addEventDateEditText);
+
+
 
         setParticipantsList(person.id);
     }

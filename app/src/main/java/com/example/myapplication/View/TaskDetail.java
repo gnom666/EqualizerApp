@@ -47,7 +47,8 @@ public class TaskDetail extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.taskdetailToolbar);
+        toolbar.setTitle("Edit Task");
         setSupportActionBar(toolbar);
 
         me = getIntent();
@@ -90,7 +91,7 @@ public class TaskDetail extends AppCompatActivity {
 
         name.setText(task.name);
         description.setText(task.description);
-        amount.setText(amount2string(task.ammount));
+        amount.setText(amount2string(task.amount));
     }
 
     public void onCancelClick (View view) {
@@ -102,12 +103,12 @@ public class TaskDetail extends AppCompatActivity {
         boolean modified = false;
         modified |= !(task.name.equals(name.getText().toString()));
         modified |= !(task.description.equals(description.getText().toString()));
-        modified |= (task.ammount != Double.parseDouble(amount.getText().toString()));
+        modified |= (task.amount != Double.parseDouble(amount.getText().toString()));
 
         if (modified) {
             task.name = name.getText().toString();
             task.description = description.getText().toString();
-            task.ammount = Double.valueOf(amount.getText().toString());
+            task.amount = Double.valueOf(amount.getText().toString());
 
             try {
                 modifyTask();
