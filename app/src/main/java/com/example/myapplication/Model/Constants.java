@@ -6,7 +6,7 @@ public final class Constants {
     public static String IP_WORK = "10.23.51.45";
     public static String IP_EC2 = "52.47.157.126";
     public static String DNS_GLOBAL = "ec2-52-47-157-126.eu-west-3.compute.amazonaws.com";
-    public static String IP = IP_HOME;
+    public static String IP = DNS_GLOBAL;
     public static String PORT = "9003";
 
     public static String URL_UserById = "http://" + IP + ":" + PORT + "/people/userbyid/";
@@ -33,17 +33,18 @@ public final class Constants {
 
     public static String URL_TestPayments = "http://" + IP + ":" + PORT + "/payments/testpayments/";
 
-    public enum ErrorCode {
+    public static enum ErrorCode {
         UNKNOWN,
         ACTIVITY_SERVICES,
         PAYMENTS_SERVICES,
         PERSON_SERVICES,
-        TASKS_SERVICES
+        TASKS_SERVICES,
+        ATTACHMENT_SERVICES
     }
 
     public static String errorCodeName (ErrorCode code) {
 
-        String codeName;
+        String codeName = "";
         switch (code) {
             case ACTIVITY_SERVICES:
                 codeName = "ACTIVITY_SERVICES";
@@ -57,6 +58,9 @@ public final class Constants {
             case TASKS_SERVICES:
                 codeName = "TASKS_SERVICES";
                 break;
+            case ATTACHMENT_SERVICES:
+                codeName = "ATTACHMENT_SERVICES";
+                break;
             default:
                 codeName = "UNKNOWN";
         }
@@ -68,7 +72,9 @@ public final class Constants {
         ACTIVITY_NOT_FOUND,
         PAYMENT_NOT_FOUND,
         PERSON_NOT_FOUND,
+        REGISTRATION_NOT_FOUND,
         TASK_NOT_FOUND,
+        ATTACHMENT_NOT_FOUND,
         ACTIVITYOWNER_MISSMATCH,
         PAYMENTSLISTS_MISSMATCH,
         PAYMENT_USERMISSMATCH,
@@ -76,7 +82,11 @@ public final class Constants {
         ZERO_PERSONS,
         INCORRECT_PASSWORD,
         BAD_DATE_FORMAT,
-        EXISTENT_DATA
+        EXISTENT_DATA,
+        PERSON_DISABLED,
+        WRONG_TOKEN,
+        TOKEN_EXPIRED,
+        USER_ENABLED
     }
 
     public static String errorTypeName (ErrorType type) {
@@ -91,6 +101,9 @@ public final class Constants {
                 break;
             case PERSON_NOT_FOUND:
                 typeName = "PERSON_NOT_FOUND";
+                break;
+            case REGISTRATION_NOT_FOUND:
+                typeName = "REGISTRATION_NOT_FOUND";
                 break;
             case TASK_NOT_FOUND:
                 typeName = "TASK_NOT_FOUND";
@@ -118,6 +131,21 @@ public final class Constants {
                 break;
             case EXISTENT_DATA:
                 typeName = "EXISTENT_DATA";
+                break;
+            case PERSON_DISABLED:
+                typeName = "PERSON_DISABLED";
+                break;
+            case ATTACHMENT_NOT_FOUND:
+                typeName = "ATTACHMENT_NOT_FOUND";
+                break;
+            case TOKEN_EXPIRED:
+                typeName = "TOKEN_EXPIRED";
+                break;
+            case WRONG_TOKEN:
+                typeName = "WRONG_TOKEN";
+                break;
+            case USER_ENABLED:
+                typeName = "USER_ENABLED";
                 break;
             default:
                 typeName = "UNKNOWN";

@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -89,6 +90,8 @@ public class EventDetailed extends AppCompatActivity {
     TabParticipants tabParticipants;
     TabPayments tabPayments;
     LayoutInflater layOutInflater;
+    AlertDialog.Builder confirmationDialogBuilder;
+    AlertDialog confirmationDialog;
 
     final int TASKS_POSITION = 0;
     final int PARTICIPANTS_POSITION = 1;
@@ -113,6 +116,8 @@ public class EventDetailed extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private AlertDialog confirmationAlertDialog;
+    private AlertDialog.Builder confirmationAlertDialogBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -496,6 +501,49 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
+    private void deleteTaskConfirmation(final long tId) {
+
+        LayoutInflater li = LayoutInflater.from(getApplicationContext());
+        View confirmationView = li.inflate(R.layout.confirmation_layout, null);
+
+        TextView question = confirmationView.findViewById(R.id.confirmationTextView);
+        question.setText("Sure?");
+
+        Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
+        dialogNoButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                confirmationAlertDialog.cancel();
+                //confirmationAlertDialog.dismiss();
+            }
+        });
+
+        Button dialogYesButton = confirmationView.findViewById(R.id.genericYeslButton);
+        dialogYesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                deleteTask(tId);
+                confirmationAlertDialog.cancel();
+            }
+        });
+
+        confirmationDialogBuilder = new AlertDialog.Builder((Context)mThis);
+        confirmationDialogBuilder.setView(confirmationView);
+        confirmationDialogBuilder.setCancelable(false);
+        confirmationDialogBuilder.setTitle("");
+
+        confirmationAlertDialog = confirmationDialogBuilder.create();
+        confirmationAlertDialog.show();
+
+        /*addContactDialog = new Dialog((Context) mThis);
+        addContactDialog.setContentView(addContactView);
+        addContactDialog.show();*/
+
+
+    }
+
     public void deleteTask (final long tId) {
 
         TasksServices tasksServices = new TasksServices();
@@ -581,6 +629,49 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
+    private void deleteEventConfirmation() {
+
+        LayoutInflater li = LayoutInflater.from(getApplicationContext());
+        View confirmationView = li.inflate(R.layout.confirmation_layout, null);
+
+        TextView question = confirmationView.findViewById(R.id.confirmationTextView);
+        question.setText("Sure?");
+
+        Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
+        dialogNoButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                confirmationAlertDialog.cancel();
+                //confirmationAlertDialog.dismiss();
+            }
+        });
+
+        Button dialogYesButton = confirmationView.findViewById(R.id.genericYeslButton);
+        dialogYesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                deleteEvent();
+                confirmationAlertDialog.cancel();
+            }
+        });
+
+        confirmationDialogBuilder = new AlertDialog.Builder((Context)mThis);
+        confirmationDialogBuilder.setView(confirmationView);
+        confirmationDialogBuilder.setCancelable(false);
+        confirmationDialogBuilder.setTitle("");
+
+        confirmationAlertDialog = confirmationDialogBuilder.create();
+        confirmationAlertDialog.show();
+
+        /*addContactDialog = new Dialog((Context) mThis);
+        addContactDialog.setContentView(addContactView);
+        addContactDialog.show();*/
+
+
+    }
+
     public void deleteEvent () {
 
         EventServices eventServices = new EventServices();
@@ -646,7 +737,7 @@ public class EventDetailed extends AppCompatActivity {
                 if (!isOwner) {
                     Toast.makeText(this, R.string.owner_can_delete, Toast.LENGTH_SHORT).show();
                 }   else {
-                    deleteEvent();
+                    deleteEventConfirmation();
                 }
                 return true;
             default:
@@ -905,7 +996,7 @@ public class EventDetailed extends AppCompatActivity {
             deleteListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteTask((long) view.getTag());
+                    deleteTaskConfirmation((long) view.getTag());
                 }
             };
         }

@@ -49,9 +49,13 @@ public class LogIn extends AppCompatActivity {
                     Person person = mapper.readValue(response, Person.class);
 
                     if (person != null && person.id != 0) {
-                        me.putExtra("person", response);
-                        setResult(RESULT_OK, me);
-                        finish();
+                        if (person.error != null) {
+                            Toast.makeText(getBaseContext(), person.error.description, Toast.LENGTH_SHORT).show();
+                        }   else {
+                            me.putExtra("person", response);
+                            setResult(RESULT_OK, me);
+                            finish();
+                        }
                     }   else {
                         Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
                     }

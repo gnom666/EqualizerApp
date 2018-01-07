@@ -56,6 +56,9 @@ public class Contacts extends AppCompatActivity {
     Dialog addContactDialog;
     AlertDialog.Builder addContactDialogBuilder;
     AlertDialog addContactAlertDialog;
+    AlertDialog.Builder confirmationDialogBuilder;
+    AlertDialog confirmationAlertDialog;
+
     CountDownTimer timer;
 
     @Override
@@ -114,7 +117,7 @@ public class Contacts extends AppCompatActivity {
         View addContactView = li.inflate(R.layout.contact_add_layout, null);
 
         EditText email = addContactView.findViewById(R.id.contactEmailEditText);
-        email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        email.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS);
 
         Button dialogCancelButton = addContactView.findViewById(R.id.genericCancelButton);
         dialogCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +151,48 @@ public class Contacts extends AppCompatActivity {
 
         addContactAlertDialog = addContactDialogBuilder.create();
         addContactAlertDialog.show();
+
+        /*addContactDialog = new Dialog((Context) mThis);
+        addContactDialog.setContentView(addContactView);
+        addContactDialog.show();*/
+
+
+    }
+
+    private void showConfirmationDialog(final long pId) {
+
+        LayoutInflater li = LayoutInflater.from(getApplicationContext());
+        View confirmationView = li.inflate(R.layout.confirmation_layout, null);
+
+        TextView question = confirmationView.findViewById(R.id.confirmationTextView);
+        question.setText("Sure?");
+
+        Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
+        dialogNoButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                confirmationAlertDialog.cancel();
+            }
+        });
+
+        Button dialogYesButton = confirmationView.findViewById(R.id.genericYeslButton);
+        dialogYesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                removeContact(pId);
+                confirmationAlertDialog.cancel();
+            }
+        });
+
+        confirmationDialogBuilder = new AlertDialog.Builder((Context)mThis);
+        confirmationDialogBuilder.setView(confirmationView);
+        confirmationDialogBuilder.setCancelable(false);
+        confirmationDialogBuilder.setTitle("");
+
+        confirmationAlertDialog = confirmationDialogBuilder.create();
+        confirmationAlertDialog.show();
 
         /*addContactDialog = new Dialog((Context) mThis);
         addContactDialog.setContentView(addContactView);
@@ -342,7 +387,8 @@ public class Contacts extends AppCompatActivity {
                 public void onClick(View view) {
                     long pId = (long)((ImageButton) view).getTag();
 
-                    removeContact(pId);
+                    showConfirmationDialog(pId);
+                    //removeContact(pId);
                 }
             };
         }
