@@ -15,7 +15,8 @@ public final class Constants {
     public static String URL_UsersList = "http://" + IP + ":" + PORT + "/people/userslist/";
     public static String URL_Contacts = "http://" + IP + ":" + PORT + "/people/contactsbyid/";
     public static String URL_Participants = "http://" + IP + ":" + PORT + "/people/participantsbyact/";
-    public static String URL_AddPerson = "http://" + IP + ":" + PORT + "/people/addperson/";
+    public static String URL_AddGoogleUser = "http://" + IP + ":" + PORT + "/people/addperson/";
+    public static String URL_AddPerson = "http://" + IP + ":" + PORT + "/people/addgoogleuser/";
     public static String URL_SendMail = "http://" + IP + ":" + PORT + "/people/sendmail/";
     public static String URL_ModifyPerson = "http://" + IP + ":" + PORT + "/people/modifyperson/";
     public static String URL_SetFriendByEmail = "http://" + IP + ":" + PORT + "/people/setfriendbyemail/";

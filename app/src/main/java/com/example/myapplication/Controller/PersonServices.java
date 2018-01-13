@@ -72,6 +72,12 @@ public class PersonServices {
         GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
     }
 
+    public void addGoogleUser (android.content.Context context, String paramName, JSONObject paramJSON, final VolleyCallback callback, final Response.ErrorListener errorListener) {
+        String URL = Constants.URL_AddGoogleUser;
+
+        GenericServices.callPostService(context, Request.Method.POST, URL, paramName, paramJSON, callback, errorListener);
+    }
+
     public void sendMail (android.content.Context context, String user, final VolleyCallback callback, final Response.ErrorListener errorListener) {
 
         String URL = Constants.URL_SendMail + "?user=" + user;

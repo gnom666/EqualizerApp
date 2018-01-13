@@ -11,6 +11,8 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
@@ -27,6 +29,8 @@ import com.example.myapplication.Controller.EventServices;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.TasksServices;
 import com.example.myapplication.Controller.VolleyCallback;
+import com.example.myapplication.Controller.google.GoogleHelper;
+import com.example.myapplication.Controller.google.GoogleListener;
 import com.example.myapplication.Model.Event;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.Model.Task;
@@ -36,12 +40,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserPage extends AppCompatActivity {
+public class UserPage extends AppCompatActivity implements GoogleListener {
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
@@ -55,8 +61,15 @@ public class UserPage extends AppCompatActivity {
 
     Intent me;
     ObjectMapper mapper;
-    FloatingActionButton fab;
+
+    FloatingActionButton fabAdd;
     FloatingActionButton fabContacts;
+    FloatingActionButton fabLogout;
+    FloatingActionButton fabExpander;
+    boolean expanded = false;
+    boolean hidden = false;
+    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide;
+
     CountDownTimer timer;
 
     String personJSON;
@@ -69,6 +82,8 @@ public class UserPage extends AppCompatActivity {
     VolleyCallback vc = null;
     Response.ErrorListener el = null;
 
+    GoogleHelper googleHelper;
+    GoogleSignInAccount acct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +96,10 @@ public class UserPage extends AppCompatActivity {
 
         initialize();
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        fabAdd = (FloatingActionButton) findViewById(R.id.fab);
+        fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent eventAddIntent = new Intent(getApplicationContext(), EventAdd.class);
@@ -108,6 +125,44 @@ public class UserPage extends AppCompatActivity {
                 startActivityForResult(contactsIntent, contactsCode);
             }
         });
+
+
+        fabLogout = findViewById(R.id.logoutButton);
+        fabLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                googleHelper.performSignOut();
+                setResult(RESULT_OK, me);
+                finish();
+            }
+        });
+
+        fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        fabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_cw);
+        fabRotateACW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_acw);
+        fabHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide);
+        fabUnHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide);
+
+        fabExpander = findViewById(R.id.expander);
+        fabExpander.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            if (expanded) {
+                closeFabs();
+            }   else {
+                openFabs();
+            }
+            expanded = !expanded;
+            }
+        });
+
+        expanded = false;
+        fabAdd.setClickable(false);
+        fabContacts.setClickable(false);
+        fabLogout.setClickable(false);
+
+        googleHelper = new GoogleHelper(this, this, null);
     }
 
     /*@Override
@@ -328,7 +383,10 @@ public class UserPage extends AppCompatActivity {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {
                     if (scrollState == 1) {
-                        fabsVisibility(false);
+                        if (!hidden) {
+                            fabsVisibility(false);
+                            hidden = true;
+                        }
                     }   else {
                         startTimer(2000);
                     }
@@ -349,13 +407,52 @@ public class UserPage extends AppCompatActivity {
     }
 
     public void fabsVisibility (boolean visibility) {
+        hidden = !visibility;
         if (!visibility) {
-            fab.setVisibility(View.INVISIBLE);
-            fabContacts.setVisibility(View.INVISIBLE);
+            if (expanded) {
+                fabClose.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {}
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        fabExpander.startAnimation(fabHide);
+                        fabClose.setAnimationListener(null);
+                    }
+                });
+                closeFabs();
+                expanded = false;
+
+            }   else {
+                fabExpander.startAnimation(fabHide);
+            }
         }   else {
-            fab.setVisibility(View.VISIBLE);
-            fabContacts.setVisibility(View.VISIBLE);
+            fabExpander.startAnimation(fabUnHide);
         }
+    }
+
+    public void openFabs () {
+        if (acct != null)
+            fabLogout.startAnimation(fabOpen);
+        fabAdd.startAnimation(fabOpen);
+        fabContacts.startAnimation(fabOpen);
+        fabExpander.startAnimation(fabRotateACW);
+        fabAdd.setClickable(true);
+        fabContacts.setClickable(true);
+        fabLogout.setClickable(true);
+    }
+
+    public void closeFabs () {
+        if (acct != null)
+            fabLogout.startAnimation(fabClose);
+        fabAdd.startAnimation(fabClose);
+        fabContacts.startAnimation(fabClose);
+        fabExpander.startAnimation(fabRotateCW);
+        fabAdd.setClickable(false);
+        fabContacts.setClickable(false);
+        fabLogout.setClickable(false);
     }
 
     private void startTimer(long time){
@@ -406,8 +503,20 @@ public class UserPage extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onGoogleAuthSignIn(String authToken, String userId) {
 
+    }
 
+    @Override
+    public void onGoogleAuthSignInFailed(String errorMessage) {
+
+    }
+
+    @Override
+    public void onGoogleAuthSignOut() {
+
+    }
 
 
     public class EventsExpandableListAdapter extends BaseExpandableListAdapter {

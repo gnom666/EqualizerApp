@@ -89,13 +89,13 @@
 
             <Button
                 android:id="@+id/cancelButton"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@android:color/holo_blue_light"
                 android:onClick="cancelClick"
-                android:text="Cancel"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:backgroundTint="@android:color/holo_blue_light"/>
+                android:text="Cancel" />
 
             <Button
                 android:id="@+id/okButton"

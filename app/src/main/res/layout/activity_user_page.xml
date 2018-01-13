@@ -35,32 +35,66 @@
         tools:layout_editor_absoluteY="103dp" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/logoutButton"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="184dp"
         android:clickable="true"
         android:tint="@android:color/background_light"
-        app:backgroundTint="@android:color/holo_green_light"
+        app:backgroundTint="@android:color/holo_red_light"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
         app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/add" />
+        app:srcCompat="@drawable/logout"
+        android:visibility="invisible"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabContacts"
         style="@style/Widget.Design.FloatingActionButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="128dp"
         android:clickable="true"
         android:tint="@android:color/background_light"
         app:backgroundTint="@android:color/holo_blue_light"
         app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="left|bottom"
+        app:layout_anchorGravity="right|bottom"
         app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/contact" />
+        app:srcCompat="@drawable/contact"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="72dp"
+        android:clickable="true"
+        android:tint="@android:color/background_light"
+        app:backgroundTint="@android:color/holo_green_light"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="right|bottom"
+        app:rippleColor="@android:color/holo_blue_bright"
+        app:srcCompat="@drawable/add"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/expander"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:tint="@android:color/background_light"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="right|bottom"
+        app:rippleColor="@android:color/holo_blue_bright"
+        app:srcCompat="@drawable/open_up" />
 
     <include
         android:id="@+id/include"

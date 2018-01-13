@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "262139897752",
+    "project_id": "equalizer-001"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262139897752:android:13c3c6a65bcbec53",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "262139897752-a8mpm2nsqp35ogahavrciel3pgmb98qk.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "262139897752-6t3mr48ps0el85pf822etl29jd2q54fq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapplication",
+            "certificate_hash": "7594a53aff07b0fa4c6b3b56d8dcf77620c751db"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTB2QC02XqEvWTFzm2fpOMrpGrqYAXowo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

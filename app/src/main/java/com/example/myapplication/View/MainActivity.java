@@ -1,6 +1,7 @@
 package com.example.myapplication.View;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,9 +33,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent loginIntent = new Intent(getApplicationContext(), LogIn.class);
-        startActivityForResult(loginIntent, rCode);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personGivenName = acct.getGivenName();
+            String personFamilyName = acct.getFamilyName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
 
+            Intent userPageIntent = new Intent(getApplicationContext(), UserPage.class);
+            userPageIntent.putExtra("user", acct.getEmail());
+            userPageIntent.putExtra("password", acct.getId());
+            startActivityForResult(userPageIntent, userPageRequestCode);
+        }   else {
+
+            Intent loginIntent = new Intent(getApplicationContext(), LogIn.class);
+            startActivityForResult(loginIntent, rCode);
+        }
     }
 
     @Override
@@ -62,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(loginIntent, rCode);
         }
         if (requestCode == userPageRequestCode && resultCode == RESULT_OK) {
-            Log.i("info", "UserPage returned");
-            finish();
+            loginIntent = new Intent(getApplicationContext(), LogIn.class);
+            startActivityForResult(loginIntent, rCode);
         }
-        if (requestCode == userPageRequestCode) {
+        if (requestCode == userPageRequestCode && resultCode == RESULT_CANCELED) {
             Log.i("info", "UserPage returned");
             finish();
         }

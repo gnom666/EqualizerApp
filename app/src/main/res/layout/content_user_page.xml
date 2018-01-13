@@ -9,38 +9,29 @@
     tools:showIn="@layout/activity_user_page">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:id="@+id/eventsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingBottom="8dp"
+        android:paddingEnd="8dp">
 
-        <LinearLayout
-            android:id="@+id/eventsLayout"
+        <ExpandableListView
+            android:id="@+id/eventsExpandableListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:childDivider="@null"
+            android:choiceMode="singleChoice"
+            android:clickable="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:contextClickable="true"
+            android:divider="@null"
+            android:dividerHeight="6dp"
+            android:importantForAutofill="auto">
 
-            <ExpandableListView
-                android:id="@+id/eventsExpandableListView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:childDivider="@null"
-                android:choiceMode="singleChoice"
-                android:clickable="true"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:contextClickable="true"
-                android:divider="@null"
-                android:dividerHeight="6dp"
-                android:importantForAutofill="auto">
-
-            </ExpandableListView>
-
-        </LinearLayout>
+        </ExpandableListView>
 
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

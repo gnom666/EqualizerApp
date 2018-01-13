@@ -1,9 +1,11 @@
 package com.example.myapplication.View;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,10 +17,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.VolleyCallback;
+import com.example.myapplication.Controller.google.GoogleHelper;
+import com.example.myapplication.Controller.google.GoogleListener;
 import com.example.myapplication.Model.Person;
 import com.example.myapplication.R;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Register extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class Register extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleListener {
 
     String user;
     String firstName;
@@ -46,6 +52,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 
     Intent me;
     ObjectMapper mapper;
+
+    GoogleHelper googleHelper;
 
     public void okClick (View view) {
         user = userEditText.getText().toString();
@@ -162,6 +170,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         numpersSpinner.setAdapter(dataAdapter);
         numpersSpinner.setOnItemSelectedListener(this);
+
+        googleHelper=new GoogleHelper(this, this, null);
     }
 
     @Override
@@ -172,5 +182,37 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
         numpers = "1";
+    }
+
+    @Override
+    public void onGoogleAuthSignIn(String authToken, String userId) {
+        Log.i("signIn", "authToken->" + authToken + "userId->" + userId);
+        //googleHelper.performSignOut();
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personGivenName = acct.getGivenName();
+            String personFamilyName = acct.getFamilyName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+            Log.i("signIn:data", "name->" + personName + "  email->" + personEmail);
+        }
+    }
+
+    @Override
+    public void onGoogleAuthSignInFailed(String errorMessage) {
+        Log.i("signInFailed", "error" + errorMessage);
+    }
+
+    @Override
+    public void onGoogleAuthSignOut() {
+        Log.i("signOut", "signed out");
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        googleHelper.onActivityResult(requestCode, resultCode, data);
     }
 }
