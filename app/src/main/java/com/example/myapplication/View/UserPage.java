@@ -1,9 +1,14 @@
 package com.example.myapplication.View;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -74,9 +79,11 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
 
     String personJSON;
     String activitiesJSON;
-    private int eventAddCode = 40;
-    private int eventDetailCode = 50;
-    private int contactsCode = 60;
+    private final int eventAddCode = 40;
+    private final int eventDetailCode = 50;
+    private final int contactsCode = 60;
+    private final int readContactsRequest = 62;
+    private final int gcontactsCode = 61;
 
     PersonServices personServices;
     VolleyCallback vc = null;
@@ -85,9 +92,16 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
     GoogleHelper googleHelper;
     GoogleSignInAccount acct;
 
+    Context mthis;
+    Activity mThis;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mthis = getApplicationContext();
+        mThis = this;
+
         setContentView(R.layout.activity_user_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -116,13 +130,14 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
         fabContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent contactsIntent = new Intent(getApplicationContext(), Contacts.class);
+                /*Intent contactsIntent = new Intent(getApplicationContext(), Contacts.class);
                 try {
                     contactsIntent.putExtra("person", mapper.writeValueAsString(person));
                 }   catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
-                startActivityForResult(contactsIntent, contactsCode);
+                startActivityForResult(contactsIntent, contactsCode);*/
+                checkPermissions();
             }
         });
 
@@ -206,6 +221,96 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case readContactsRequest: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && acct != null) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    callNewContacts();
+
+                }   else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    callOldContacts();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    void callOldContacts () {
+        Intent contactsIntent = new Intent(getApplicationContext(), Contacts.class);
+        try {
+            contactsIntent.putExtra("person", mapper.writeValueAsString(person));
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        startActivityForResult(contactsIntent, contactsCode);
+    }
+
+    void callNewContacts () {
+        Intent contactsIntent = new Intent(getApplicationContext(), GmailContacts.class);
+        try {
+            contactsIntent.putExtra("person", mapper.writeValueAsString(person));
+        }   catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        startActivityForResult(contactsIntent, gcontactsCode);
+    }
+
+    public void checkPermissions () {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mThis,
+                    android.Manifest.permission.READ_CONTACTS)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                Log.i("checkPerm", "no");
+                callOldContacts();
+
+            }   else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(mThis,
+                        new String[]{android.Manifest.permission.READ_CONTACTS},
+                        readContactsRequest);
+
+                Log.i("checkPerm", "requested");
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }   else {
+            Log.i("checkPerm", "granted");
+            if (acct != null) {
+                callNewContacts();
+            }   else {
+                callOldContacts();
+            }
+        }
+    }
+
+
+
 
 
     public void initialize () {
@@ -221,7 +326,7 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
 
         progressBar = findViewById(R.id.userPageProgressBar);
         progressBar.setVisibility(View.VISIBLE);
-        //progressBar.animate();
+        progressBar.animate();
 
         mapper = new ObjectMapper();
 
@@ -419,6 +524,7 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         fabExpander.startAnimation(fabHide);
+                        fabExpander.setClickable(false);
                         fabClose.setAnimationListener(null);
                     }
                 });
@@ -427,9 +533,11 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
 
             }   else {
                 fabExpander.startAnimation(fabHide);
+                fabExpander.setClickable(false);
             }
         }   else {
             fabExpander.startAnimation(fabUnHide);
+            fabExpander.setClickable(true);
         }
     }
 

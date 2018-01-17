@@ -105,8 +105,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:layout_margin="4dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
         app:backgroundTint="@android:color/holo_green_light"
+        app:layout_anchor="@+id/container"
+        app:layout_anchorGravity="left|bottom"
         app:srcCompat="@drawable/add" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="120dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@android:color/holo_green_light"
+        app:srcCompat="@drawable/edit2"
+        android:visibility="invisible"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventDelete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="64dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@android:color/holo_red_light"
+        app:srcCompat="@drawable/delete"
+        android:visibility="invisible"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventExpand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@android:color/holo_blue_light"
+        app:srcCompat="@drawable/open_up" />
+
+    <!-- android.support.design.widget.FloatingActionButton
+        android:id="@+id/expander2"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:tint="@android:color/background_light"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="end|bottom"
+        app:rippleColor="@android:color/holo_blue_bright"
+        app:srcCompat="@drawable/open_up" / -->
 
 </android.support.design.widget.CoordinatorLayout>

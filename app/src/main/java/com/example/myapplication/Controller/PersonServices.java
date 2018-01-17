@@ -37,6 +37,13 @@ public class PersonServices {
         GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
     }
 
+    public void unsetFriendsByEmail (android.content.Context context, long person1Id, String person2email, VolleyCallback callback, final Response.ErrorListener errorListener) {
+
+        String URL = Constants.URL_UnsetFriendsByEmail + "?person1Id=" + person1Id + "&person2email=" + person2email;
+
+        GenericServices.callListService(context, Request.Method.GET, URL, null, null, callback, errorListener);
+    }
+
     public void userByEmailAndPass (android.content.Context context, String user, String password, final VolleyCallback callback, final Response.ErrorListener errorListener) {
 
         String URL = Constants.URL_CheckUserAndPass + "?uName=" + user + "&uPass=" + password;

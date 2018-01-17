@@ -16,10 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -76,14 +76,28 @@ public class EventDetailed extends AppCompatActivity {
     ListView paymentsListView;
     PaymentsListAdapter paymentsListAdapter;
     LinearLayout buttonsLayout;
+    Button okButton;
+    Button cancelButton;
+
     HashMap<Long, CheckBox> participantsCheckboxes;
     AbsListView.OnScrollListener onScrollListener;
     AbsListView.OnScrollListener onScrollParticipantsListener;
+    AbsListView.OnScrollListener onScrollPaymentsListener;
 
     Intent me;
     ObjectMapper mapper;
     Object mThis;
-    FloatingActionButton fab;
+
+
+    FloatingActionButton fabAddTask;
+    FloatingActionButton fabEdit;
+    FloatingActionButton fabDelete;
+    FloatingActionButton fabExpander;
+    boolean expanded = false;
+    boolean hidden = false;
+    boolean addHidden = false;
+    boolean layoutHidden = true;
+    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide, fabHideLeft, fabUnHideLeft, fabHideDown, fabUnHideDown;
     CountDownTimer timer;
 
     TabTasks tabTasks;
@@ -150,34 +164,92 @@ public class EventDetailed extends AppCompatActivity {
         });
 
 
-        fab = findViewById(R.id.detailedEventAddTask);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fabAddTask = findViewById(R.id.detailedEventAddTask);
+        fabAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addTask();
             }
         });
 
+        fabDelete = (FloatingActionButton) findViewById(R.id.detailedEventDelete);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isOwner) {
+                    Toast.makeText(getApplicationContext(), R.string.owner_can_delete, Toast.LENGTH_SHORT).show();
+                }   else {
+                    deleteEventConfirmation();
+                }
+            }
+        });
+
+
+        fabEdit = findViewById(R.id.detailedEventEdit);
+        fabEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isOwner) {
+                    Toast.makeText(getApplicationContext(), R.string.owner_can_edit, Toast.LENGTH_SHORT).show();
+                }   else {
+                    editEvent();
+                }
+            }
+        });
+
+        fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        fabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_cw);
+        fabRotateACW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_acw);
+        fabHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide);
+        fabUnHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide);
+        fabHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_left);
+        fabUnHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_left);
+        fabHideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_down);
+        fabUnHideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_down);
+
+        fabExpander = findViewById(R.id.detailedEventExpand);
+        fabExpander.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (expanded) {
+                    closeFabs();
+                }   else {
+                    openFabs();
+                }
+                expanded = !expanded;
+            }
+        });
+
+        expanded = false;
+        fabEdit.setClickable(false);
+        fabDelete.setClickable(false);
+
         onScrollListener = new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 1) {
-                    fab.setVisibility(View.INVISIBLE);
+                    if (!hidden) {
+                        fabsVisibility(false);
+                        if (isOwner)
+                            setEditLayoutVisibility(false);
+                        hidden = true;
+                    }
                 }   else {
-                    startFabsTimer(2000);
+                    startTimer(2000);
                 }
             }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                Log.i("POSITION", String.valueOf(POSITION));
+                /*Log.i("POSITION", String.valueOf(POSITION));
                 int lastItem = firstVisibleItem + visibleItemCount;
                 if (POSITION != TASKS_POSITION || (lastItem == totalItemCount && firstVisibleItem > 0)) {
-                    fab.setVisibility(View.INVISIBLE);
+                    fabAddTask.setVisibility(View.INVISIBLE);
                 }   else {
-                    fab.setVisibility(View.VISIBLE);
-                }
+                    fabAddTask.setVisibility(View.VISIBLE);
+                }*/
             }
         };
 
@@ -185,33 +257,143 @@ public class EventDetailed extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 1) {
+                    if (!hidden) {
+                        fabsVisibility(false);
+                        if (POSITION == PARTICIPANTS_POSITION && isOwner)
+                            setEditLayoutVisibility(false);
+                        hidden = true;
+                    }
+                }   else {
+                    startTimer(2000);
+                }
+                /*if (scrollState == 1) {
                     setEditLayoutVisibility(false);
                 }   else {
                     startButtonsTimer(2000);
-                }
+                }*/
             }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
-                Log.i("POSITION", String.valueOf(POSITION));
+                /*Log.i("POSITION", String.valueOf(POSITION));
                 int lastItem = firstVisibleItem + visibleItemCount;
                 if (POSITION != TASKS_POSITION || (lastItem == totalItemCount && firstVisibleItem > 0)) {
-                    fab.setVisibility(View.INVISIBLE);
+                    fabAddTask.setVisibility(View.INVISIBLE);
                 }   else {
-                    fab.setVisibility(View.VISIBLE);
-                }
+                    fabAddTask.setVisibility(View.VISIBLE);
+                }*/
             }
         };
 
         buttonsLayout = findViewById(R.id.buttonsLinearLayout);
+        okButton = findViewById(R.id.editParticipantsOkButton);
+        cancelButton = findViewById(R.id.editParticipantsCancelButton);
         if (buttonsLayout != null) {
-            setEditLayoutVisibility(false);
+            buttonsLayout.setVisibility(View.INVISIBLE);
             setEditLayoutEnabled(false);
         }
 
+        onScrollPaymentsListener = new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == 1) {
+                    if (!hidden) {
+                        fabsVisibility(false);
+                        hidden = true;
+                    }
+                }   else {
+                    startTimer(2000);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {}
+        };
+
         init ();
 
+    }
+
+
+
+    public void fabsVisibility (boolean visibility) {
+        hidden = !visibility;
+        if (!visibility) {
+            if (expanded) {
+                fabClose.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {}
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        fabExpander.startAnimation(fabHide);
+                        fabExpander.setClickable(false);
+                        if (POSITION == TASKS_POSITION) {
+                            fabAddTask.startAnimation(fabHideLeft);
+                            fabAddTask.setClickable(false);
+                            addHidden = true;
+                        }
+                        fabClose.setAnimationListener(null);
+                    }
+                });
+                closeFabs();
+                expanded = false;
+
+            }   else {
+                fabExpander.startAnimation(fabHide);
+                fabExpander.setClickable(false);
+                if (POSITION == TASKS_POSITION) {
+                    fabAddTask.startAnimation(fabHideLeft);
+                    fabAddTask.setClickable(false);
+                    addHidden = true;
+                }
+            }
+        }   else {
+            fabExpander.startAnimation(fabUnHide);
+            fabExpander.setClickable(true);
+            if (POSITION == TASKS_POSITION && addHidden) {
+                fabAddTask.startAnimation(fabUnHideLeft);
+                fabAddTask.setClickable(true);
+                addHidden = false;
+            }
+        }
+    }
+
+    public void openFabs () {
+        fabEdit.startAnimation(fabOpen);
+        fabDelete.startAnimation(fabOpen);
+        fabExpander.startAnimation(fabRotateACW);
+        fabEdit.setClickable(true);
+        fabDelete.setClickable(true);
+    }
+
+    public void closeFabs () {
+        fabEdit.startAnimation(fabClose);
+        fabDelete.startAnimation(fabClose);
+        fabExpander.startAnimation(fabRotateCW);
+        fabEdit.setClickable(false);
+        fabDelete.setClickable(false);
+    }
+
+    private void startTimer(long time){
+        if (timer != null)
+            timer.cancel();
+
+        timer = new CountDownTimer(time, time){
+            public void onTick(long millisUntilDone){
+
+            }
+
+            public void onFinish() {
+                fabsVisibility(true);
+                if (POSITION == PARTICIPANTS_POSITION && isOwner)
+                    setEditLayoutVisibility(true);
+                cancel();
+            }
+        }.start();
     }
 
     private void startFabsTimer(long time){
@@ -224,8 +406,10 @@ public class EventDetailed extends AppCompatActivity {
             }
 
             public void onFinish() {
-                if (POSITION == TASKS_POSITION)
-                    fab.setVisibility(View.VISIBLE);
+                if (POSITION == TASKS_POSITION) {
+                    fabAddTask.setVisibility(View.VISIBLE);
+                    addHidden = false;
+                }
             }
         }.start();
     }
@@ -293,22 +477,51 @@ public class EventDetailed extends AppCompatActivity {
         POSITION = position;
         switch (position) {
             case TASKS_POSITION:
-                setEditLayoutVisibility(false);
-                //setTasksListView();
-                setFabVisibility(true);
+                if (!layoutHidden) {
+                    buttonsLayout.startAnimation(fabHideDown);
+                    buttonsLayout.setClickable(false);
+                    okButton.setClickable(false);
+                    cancelButton.setClickable(false);
+                    //buttonsLayout.setVisibility(View.GONE);
+                    layoutHidden = true;
+                }
+                if (addHidden) {
+                    fabAddTask.startAnimation(fabUnHideLeft);
+                    fabAddTask.setClickable(true);
+                    addHidden = false;
+                }
                 break;
             case PARTICIPANTS_POSITION:
-                if (isOwner)
-                    setEditLayoutVisibility(true);
-                //setParticipantsListView();
+                if (!addHidden) {
+                    fabAddTask.startAnimation(fabHideLeft);
+                    fabAddTask.setClickable(false);
+                    addHidden = true;
+                }
+                if (isOwner && layoutHidden) {
+                    buttonsLayout.startAnimation(fabUnHideDown);
+                    buttonsLayout.setClickable(true);
+                    okButton.setClickable(true);
+                    cancelButton.setClickable(true);
+                    //buttonsLayout.setVisibility(View.VISIBLE);
+                    layoutHidden = false;
+                }
                 if (participantsListAdapter != null)
                     participantsListAdapter.notifyDataSetChanged();
-                setFabVisibility(false);
                 break;
             case PAYMENTS_POSITION:
-                setEditLayoutVisibility(false);
-                //setTasksListView();
-                setFabVisibility(false);
+                if (!layoutHidden) {
+                    buttonsLayout.startAnimation(fabHideDown);
+                    buttonsLayout.setClickable(false);
+                    okButton.setClickable(false);
+                    cancelButton.setClickable(false);
+                    //buttonsLayout.setVisibility(View.GONE);
+                    layoutHidden = true;
+                }
+                if (!addHidden) {
+                    fabAddTask.startAnimation(fabHideLeft);
+                    fabAddTask.setClickable(false);
+                    addHidden = true;
+                }
                 break;
             default:
                 break;
@@ -460,7 +673,7 @@ public class EventDetailed extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.e("VolleyError", error.getMessage());
                     }
                 });
     }
@@ -496,7 +709,7 @@ public class EventDetailed extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        Log.e("VolleyError", error.getMessage());
                     }
                 });
     }
@@ -507,7 +720,7 @@ public class EventDetailed extends AppCompatActivity {
         View confirmationView = li.inflate(R.layout.confirmation_layout, null);
 
         TextView question = confirmationView.findViewById(R.id.confirmationTextView);
-        question.setText("Sure?");
+        question.setText(R.string.sure);
 
         Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
         dialogNoButton.setOnClickListener(new View.OnClickListener() {
@@ -635,7 +848,7 @@ public class EventDetailed extends AppCompatActivity {
         View confirmationView = li.inflate(R.layout.confirmation_layout, null);
 
         TextView question = confirmationView.findViewById(R.id.confirmationTextView);
-        question.setText("Sure?");
+        question.setText(R.string.sure);
 
         Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
         dialogNoButton.setOnClickListener(new View.OnClickListener() {
@@ -710,14 +923,14 @@ public class EventDetailed extends AppCompatActivity {
                 });
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_event_detailed, menu);
         return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
@@ -743,21 +956,35 @@ public class EventDetailed extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
-    public void setFabVisibility (boolean visible) {
+    /*public void setFabVisibility (boolean visible) {
         if (visible) {
-            fab.setVisibility(View.VISIBLE);
+            fabAddTask.setVisibility(View.VISIBLE);
         }   else {
-            fab.setVisibility(View.INVISIBLE);
+            fabAddTask.setVisibility(View.INVISIBLE);
         }
-    }
+    }*/
 
     public void setEditLayoutVisibility (boolean visible) {
-        if (visible) {
-            buttonsLayout.setVisibility(View.VISIBLE);
-        }   else {
-            buttonsLayout.setVisibility(View.INVISIBLE);
+        if (POSITION == PARTICIPANTS_POSITION) {
+            if (visible && layoutHidden) {
+                buttonsLayout.startAnimation(fabUnHideDown);
+                buttonsLayout.setClickable(true);
+                okButton.setClickable(true);
+                cancelButton.setClickable(true);
+                layoutHidden = false;
+                //buttonsLayout.setVisibility(View.GONE);
+            }
+
+            if (!visible && !layoutHidden) {
+                buttonsLayout.startAnimation(fabHideDown);
+                buttonsLayout.setClickable(false);
+                okButton.setClickable(false);
+                cancelButton.setClickable(false);
+                layoutHidden = true;
+                //buttonsLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -920,7 +1147,7 @@ public class EventDetailed extends AppCompatActivity {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             Person p = getItem(position);
-            if (view == null) {
+            //if (view == null) { // ToDo: check this with a big list of participants
                 view = layOutInflater.inflate(R.layout.participants_layout, null);
                 CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
                 checkBox.setText(p.firstName + " " + p.lastName + " (" + p.numpers + ")");
@@ -934,12 +1161,12 @@ public class EventDetailed extends AppCompatActivity {
                     checkBox.setChecked(selected.get(contacts.get(position).id));
                 }
                 participantsCheckboxes.put(p.id, checkBox);
-            }   else {
+            /*}   else {
                 CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
                 boolean checked = (selected.get(p.id) != null)? selected.get(p.id): true;
                 checkBox.setSelected(checked);
                 participantsCheckboxes.put(p.id, checkBox);
-            }
+            }*/
 
             return view;
         }
@@ -1059,6 +1286,8 @@ public class EventDetailed extends AppCompatActivity {
             paymentsListAdapter = new PaymentsListAdapter((Context) mThis, 0, payments);
         }
         paymentsListView.setAdapter(paymentsListAdapter);
+
+        paymentsListView.setOnScrollListener(onScrollPaymentsListener);
     }
 
     public void setPaymentsListView () {
@@ -1074,6 +1303,7 @@ public class EventDetailed extends AppCompatActivity {
             paymentsListView.setAdapter(paymentsListAdapter);
         }
 
+        paymentsListView.setOnScrollListener(onScrollPaymentsListener);
     }
 
     public class PaymentsListAdapter extends ArrayAdapter<Payment> {

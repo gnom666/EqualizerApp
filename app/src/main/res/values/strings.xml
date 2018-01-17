@@ -28,5 +28,7 @@
     <string name="title_activity_task_add">TaskAdd</string>
     <string name="title_activity_task_detail">TaskDetail</string>
     <string name="title_activity_contacts">Contacts</string>
+    <string name="sure">Want to delete it? This action can\'t be undone</string>
+    <string name="title_activity_gmail_contacts">GmailContacts</string>
 
 </resources>

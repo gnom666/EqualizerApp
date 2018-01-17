@@ -21,6 +21,7 @@ public final class Constants {
     public static String URL_ModifyPerson = "http://" + IP + ":" + PORT + "/people/modifyperson/";
     public static String URL_SetFriendByEmail = "http://" + IP + ":" + PORT + "/people/setfriendbyemail/";
     public static String URL_UnsetFriends = "http://" + IP + ":" + PORT + "/people/unsetfriends/";
+    public static String URL_UnsetFriendsByEmail = "http://" + IP + ":" + PORT + "/people/unsetfriendsbyemail/";
 
     public static String URL_ActivitiesByParticipant = "http://" + IP + ":" + PORT + "/activities/activitiesbyparticipant/";
     public static String URL_AddActivity = "http://" + IP + ":" + PORT + "/activities/addactivity/";

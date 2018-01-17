@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -59,7 +61,12 @@ public class Contacts extends AppCompatActivity {
     AlertDialog.Builder confirmationDialogBuilder;
     AlertDialog confirmationAlertDialog;
 
+    Animation fabHide, fabUnHide;
+    boolean hidden = false;
+
     CountDownTimer timer;
+
+    private int readContactsRequest = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +83,17 @@ public class Contacts extends AppCompatActivity {
             }
         });
 
+        fabHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide);
+        fabUnHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide);
+
         onScrollListener = new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 1) {
-                    fab.setVisibility(View.INVISIBLE);
+                    if (!hidden) {
+                        fab.startAnimation(fabHide);
+                        hidden = true;
+                    }
                 }   else {
                     startTimer(2000);
                 }
@@ -106,7 +119,8 @@ public class Contacts extends AppCompatActivity {
             }
 
             public void onFinish() {
-                fab.setVisibility(View.VISIBLE);
+                fab.startAnimation(fabUnHide);
+                hidden = false;
             }
         }.start();
     }
@@ -118,6 +132,7 @@ public class Contacts extends AppCompatActivity {
 
         EditText email = addContactView.findViewById(R.id.contactEmailEditText);
         email.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS);
+        email.setTextColor(getResources().getColor(R.color.colorGray));
 
         Button dialogCancelButton = addContactView.findViewById(R.id.genericCancelButton);
         dialogCancelButton.setOnClickListener(new View.OnClickListener() {
@@ -150,6 +165,7 @@ public class Contacts extends AppCompatActivity {
         addContactDialogBuilder.setTitle("Contact email");
 
         addContactAlertDialog = addContactDialogBuilder.create();
+        addContactAlertDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         addContactAlertDialog.show();
 
         /*addContactDialog = new Dialog((Context) mThis);
@@ -165,7 +181,7 @@ public class Contacts extends AppCompatActivity {
         View confirmationView = li.inflate(R.layout.confirmation_layout, null);
 
         TextView question = confirmationView.findViewById(R.id.confirmationTextView);
-        question.setText("Sure?");
+        question.setText(R.string.sure);
 
         Button dialogNoButton = confirmationView.findViewById(R.id.genericNoButton);
         dialogNoButton.setOnClickListener(new View.OnClickListener() {
@@ -319,6 +335,9 @@ public class Contacts extends AppCompatActivity {
         tb.setSubtitle(person.firstName + " " + person.lastName);
 
         setContactsList(person.id, false);
+
+        //checkPermissions();
+        //readContacts();
     }
 
 
@@ -396,7 +415,7 @@ public class Contacts extends AppCompatActivity {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             Person p = getItem(position);
-            if (view == null) {
+            //if (view == null) {
                 view = layOutInflater.inflate(R.layout.contacts_layout, null);
 
                 TextView name = view.findViewById(R.id.contactNameTextView);
@@ -405,12 +424,20 @@ public class Contacts extends AppCompatActivity {
                 ImageButton delete = view.findViewById(R.id.contactDeleteImageButton);
                 delete.setTag(p.id);
                 delete.setOnClickListener(listener);
-            }
+            //}
             return view;
         }
 
     }
 
+    public void readContacts(){
 
+
+
+        /*int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET);*/
+
+
+    }
 
 }
