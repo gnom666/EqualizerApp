@@ -94,6 +94,7 @@ public class Contacts extends AppCompatActivity {
                         fab.startAnimation(fabHide);
                         hidden = true;
                     }
+                    if (timer != null) timer.cancel();
                 }   else {
                     startTimer(2000);
                 }

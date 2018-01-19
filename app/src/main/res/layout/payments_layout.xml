@@ -6,7 +6,8 @@
     android:paddingLeft="4dp"
     android:paddingRight="4dp"
     android:paddingTop="8dp"
-    android:rowCount="1">
+    android:rowCount="1"
+    android:background="@drawable/common_google_signin_btn_icon_light_normal_background">
 
     <ImageButton
         android:id="@+id/paymentDirectionImageButton"
@@ -14,6 +15,7 @@
         android:layout_height="20dp"
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="6dp"
+        android:layout_marginLeft="2dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="6dp"
         android:background="@android:color/transparent"
@@ -50,7 +52,7 @@
                 <TextView
                     android:id="@+id/paymentStatusTextView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:paddingLeft="2dp"
                     android:text="TextView"
                     android:textSize="10sp" />
@@ -76,9 +78,9 @@
                 android:id="@+id/paymentAmountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="-1dp"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
+                android:paddingEnd="6dp"
                 android:text="100.00"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />

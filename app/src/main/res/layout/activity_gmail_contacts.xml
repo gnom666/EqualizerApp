@@ -30,7 +30,8 @@
         android:indeterminate="true"
         android:indeterminateTint="@color/colorAccent"
         android:indeterminateTintMode="src_in"
-        tools:layout_editor_absoluteY="103dp" />
+        tools:layout_editor_absoluteY="103dp"
+        android:translationZ="2dp"/>
 
     <include layout="@layout/content_gmail_contacts" />
 

@@ -492,9 +492,11 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                             fabsVisibility(false);
                             hidden = true;
                         }
+                        if (timer != null) timer.cancel();
                     }   else {
                         startTimer(2000);
                     }
+                    Log.i("scrollState", "" + scrollState);
                 }
 
                 @Override
@@ -756,6 +758,7 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
             detail.setClickable(true);
             detail.setTag(String.valueOf(e.id));
             detail.setOnClickListener(detailOnClickListener);
+            if (e.owner == person.id) detail.setImageResource(R.drawable.right_launcher_owner);
 
             return view;
         }

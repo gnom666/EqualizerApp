@@ -4,34 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="8dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginTop="2dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.myapplication.View.UserPage"
     tools:showIn="@layout/activity_user_page">
 
-    <LinearLayout
-        android:id="@+id/eventsLayout"
+    <ExpandableListView
+        android:id="@+id/eventsExpandableListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="8dp"
-        android:paddingEnd="8dp">
+        android:childDivider="@null"
+        android:choiceMode="singleChoice"
+        android:clickable="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:contextClickable="true"
+        android:divider="@null"
+        android:dividerHeight="4dp"
+        android:importantForAutofill="auto">
 
-        <ExpandableListView
-            android:id="@+id/eventsExpandableListView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:childDivider="@null"
-            android:choiceMode="singleChoice"
-            android:clickable="true"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:contextClickable="true"
-            android:divider="@null"
-            android:dividerHeight="6dp"
-            android:importantForAutofill="auto">
-
-        </ExpandableListView>
-
-    </LinearLayout>
+    </ExpandableListView>
 
 </android.support.constraint.ConstraintLayout>

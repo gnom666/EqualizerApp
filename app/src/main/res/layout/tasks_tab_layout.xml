@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:columnCount="6"
     android:paddingTop="4dp"
-    android:rowCount="1">
+    android:rowCount="1"
+    android:background="@drawable/common_google_signin_btn_icon_light_normal_background">
 
 
     <LinearLayout

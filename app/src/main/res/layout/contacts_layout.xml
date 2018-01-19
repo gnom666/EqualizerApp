@@ -14,7 +14,8 @@
     android:paddingBottom="8dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingTop="8dp">
+    android:paddingTop="8dp"
+    android:background="@drawable/common_google_signin_btn_icon_light_normal_background">
 
       <RelativeLayout
           android:layout_width="match_parent"

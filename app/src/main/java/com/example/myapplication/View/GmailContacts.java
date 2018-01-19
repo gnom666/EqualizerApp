@@ -44,6 +44,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,7 @@ public class GmailContacts extends AppCompatActivity {
     Dialog addContactDialog;
     AlertDialog.Builder addContactDialogBuilder;
     AlertDialog addContactAlertDialog;
+    boolean addContactAlertDialogShown;
     AlertDialog.Builder confirmationDialogBuilder;
     AlertDialog confirmationAlertDialog;
 
@@ -102,7 +105,6 @@ public class GmailContacts extends AppCompatActivity {
 
         progressBar = findViewById(R.id.contactsGmailProgressBar);
         progressBar.setVisibility(View.VISIBLE);
-        progressBar.animate();
 
         Toolbar tb = findViewById(R.id.contactsGmailToolbar);
         tb.setTitle("My Contacts");
@@ -136,6 +138,7 @@ public class GmailContacts extends AppCompatActivity {
                         fab.setClickable(false);
                         hidden = true;
                     }
+                    if (timer != null) timer.cancel();
                 }   else {
                     startTimer(2000);
                 }
@@ -368,6 +371,16 @@ public class GmailContacts extends AppCompatActivity {
             }
         }
 
+        Collections.sort(contacts, new Comparator<Person>(){
+            public int compare(Person obj1, Person obj2)
+            {
+                // TODO Auto-generated method stub
+                if (obj1.firstName.equals(obj2.firstName))
+                    return obj1.lastName.compareToIgnoreCase(obj2.lastName);
+                return obj1.firstName.compareToIgnoreCase(obj2.firstName);
+            }
+        });
+
         if (!force)
             setContactsListView();
         else
@@ -494,6 +507,7 @@ public class GmailContacts extends AppCompatActivity {
             public void onClick(View view) {
                 //addContactDialog.dismiss();
                 addContactAlertDialog.cancel();
+                addContactAlertDialogShown = false;
             }
         });
 
@@ -520,6 +534,7 @@ public class GmailContacts extends AppCompatActivity {
         addContactAlertDialog = addContactDialogBuilder.create();
         addContactAlertDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         addContactAlertDialog.show();
+        addContactAlertDialogShown = true;
 
         /*addContactDialog = new Dialog((Context) mThis);
         addContactDialog.setContentView(addContactView);
@@ -529,7 +544,9 @@ public class GmailContacts extends AppCompatActivity {
     }
 
     private void addContact(String email) {
+
         progressBar.setVisibility(View.VISIBLE);
+
         PersonServices personServices = new PersonServices();
         personServices.setFriendByEmail(this, person.id, email,
                 new VolleyCallback() {
@@ -542,23 +559,29 @@ public class GmailContacts extends AppCompatActivity {
                             if (newPerson != null) {
                                 if (newPerson.error == null) {
 
-                                    addContactAlertDialog.cancel();
+                                    if (addContactAlertDialogShown)
+                                        addContactAlertDialog.cancel();
 
                                     reBuild();
 
                                 }   else {
                                     Toast.makeText(getBaseContext(), newPerson.error.description, Toast.LENGTH_SHORT).show();
+                                    progressBar.setVisibility(View.INVISIBLE);
                                 }
 
                             }   else {
                                 Toast.makeText(getBaseContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.INVISIBLE);
                             }
 
                         }   catch (JsonParseException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }   catch (JsonMappingException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }   catch (IOException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }
                     }
@@ -569,13 +592,16 @@ public class GmailContacts extends AppCompatActivity {
                         Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
                         Log.e("error", "error response: " + error.getMessage());
                         VolleyLog.d("error", "Error: " + error.getMessage());
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
 
 
     private void removeContact(String toUnset) {
+
         progressBar.setVisibility(View.VISIBLE);
+
         PersonServices personServices = new PersonServices();
         personServices.unsetFriendsByEmail(this, person.id, toUnset,
                 new VolleyCallback() {
@@ -599,17 +625,22 @@ public class GmailContacts extends AppCompatActivity {
                                     if (result.get(1).error != null) {
                                         Toast.makeText(getBaseContext(), result.get(0).error.description, Toast.LENGTH_SHORT).show();
                                     }
+                                    progressBar.setVisibility(View.INVISIBLE);
                                 }
 
                             }   else {
                                 Toast.makeText(getBaseContext(), "Unknown error", Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.INVISIBLE);
                             }
 
                         }   catch (JsonParseException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }   catch (JsonMappingException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }   catch (IOException e) {
+                            progressBar.setVisibility(View.INVISIBLE);
                             e.printStackTrace();
                         }
                     }
@@ -620,6 +651,7 @@ public class GmailContacts extends AppCompatActivity {
                         Toast.makeText(getBaseContext(), "Unknown User or Password", Toast.LENGTH_SHORT).show();
                         Log.e("error", "error response: " + error.getMessage());
                         VolleyLog.d("error", "Error: " + error.getMessage());
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }

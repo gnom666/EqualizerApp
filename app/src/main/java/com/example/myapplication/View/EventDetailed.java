@@ -23,9 +23,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,11 +73,8 @@ public class EventDetailed extends AppCompatActivity {
     TasksListAdapter tasksListAdapter;
     ListView paymentsListView;
     PaymentsListAdapter paymentsListAdapter;
-    LinearLayout buttonsLayout;
-    Button okButton;
-    Button cancelButton;
 
-    HashMap<Long, CheckBox> participantsCheckboxes;
+    HashMap<Long, View> participantsViews;
     AbsListView.OnScrollListener onScrollListener;
     AbsListView.OnScrollListener onScrollParticipantsListener;
     AbsListView.OnScrollListener onScrollPaymentsListener;
@@ -88,7 +83,6 @@ public class EventDetailed extends AppCompatActivity {
     ObjectMapper mapper;
     Object mThis;
 
-
     FloatingActionButton fabAddTask;
     FloatingActionButton fabEdit;
     FloatingActionButton fabDelete;
@@ -96,8 +90,7 @@ public class EventDetailed extends AppCompatActivity {
     boolean expanded = false;
     boolean hidden = false;
     boolean addHidden = false;
-    boolean layoutHidden = true;
-    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide, fabHideLeft, fabUnHideLeft, fabHideDown, fabUnHideDown;
+    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide, fabHideLeft, fabUnHideLeft;
     CountDownTimer timer;
 
     TabTasks tabTasks;
@@ -106,6 +99,9 @@ public class EventDetailed extends AppCompatActivity {
     LayoutInflater layOutInflater;
     AlertDialog.Builder confirmationDialogBuilder;
     AlertDialog confirmationDialog;
+
+    View.OnClickListener listenerAdd;
+    View.OnClickListener listenerRemove;
 
     final int TASKS_POSITION = 0;
     final int PARTICIPANTS_POSITION = 1;
@@ -205,8 +201,6 @@ public class EventDetailed extends AppCompatActivity {
         fabUnHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide);
         fabHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_left);
         fabUnHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_left);
-        fabHideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_down);
-        fabUnHideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_down);
 
         fabExpander = findViewById(R.id.detailedEventExpand);
         fabExpander.setOnClickListener(new View.OnClickListener() {
@@ -231,10 +225,9 @@ public class EventDetailed extends AppCompatActivity {
                 if (scrollState == 1) {
                     if (!hidden) {
                         fabsVisibility(false);
-                        if (isOwner)
-                            setEditLayoutVisibility(false);
                         hidden = true;
                     }
+                    if (timer != null) timer.cancel();
                 }   else {
                     startTimer(2000);
                 }
@@ -259,10 +252,9 @@ public class EventDetailed extends AppCompatActivity {
                 if (scrollState == 1) {
                     if (!hidden) {
                         fabsVisibility(false);
-                        if (POSITION == PARTICIPANTS_POSITION && isOwner)
-                            setEditLayoutVisibility(false);
                         hidden = true;
                     }
+                    if (timer != null) timer.cancel();
                 }   else {
                     startTimer(2000);
                 }
@@ -286,14 +278,6 @@ public class EventDetailed extends AppCompatActivity {
             }
         };
 
-        buttonsLayout = findViewById(R.id.buttonsLinearLayout);
-        okButton = findViewById(R.id.editParticipantsOkButton);
-        cancelButton = findViewById(R.id.editParticipantsCancelButton);
-        if (buttonsLayout != null) {
-            buttonsLayout.setVisibility(View.INVISIBLE);
-            setEditLayoutEnabled(false);
-        }
-
         onScrollPaymentsListener = new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -302,6 +286,7 @@ public class EventDetailed extends AppCompatActivity {
                         fabsVisibility(false);
                         hidden = true;
                     }
+                    if (timer != null) timer.cancel();
                 }   else {
                     startTimer(2000);
                 }
@@ -389,48 +374,12 @@ public class EventDetailed extends AppCompatActivity {
 
             public void onFinish() {
                 fabsVisibility(true);
-                if (POSITION == PARTICIPANTS_POSITION && isOwner)
-                    setEditLayoutVisibility(true);
                 cancel();
             }
         }.start();
     }
 
-    private void startFabsTimer(long time){
-        if (timer != null)
-            timer.cancel();
-
-        timer = new CountDownTimer(time, time){
-            public void onTick(long millisUntilDone){
-
-            }
-
-            public void onFinish() {
-                if (POSITION == TASKS_POSITION) {
-                    fabAddTask.setVisibility(View.VISIBLE);
-                    addHidden = false;
-                }
-            }
-        }.start();
-    }
-
-    private void startButtonsTimer(long time){
-        if (timer != null)
-            timer.cancel();
-
-        timer = new CountDownTimer(time, time){
-            public void onTick(long millisUntilDone){
-
-            }
-
-            public void onFinish() {
-                if (POSITION == PARTICIPANTS_POSITION)
-                    setEditLayoutVisibility(true);
-            }
-        }.start();
-    }
-
-    /**
+     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -477,14 +426,6 @@ public class EventDetailed extends AppCompatActivity {
         POSITION = position;
         switch (position) {
             case TASKS_POSITION:
-                if (!layoutHidden) {
-                    buttonsLayout.startAnimation(fabHideDown);
-                    buttonsLayout.setClickable(false);
-                    okButton.setClickable(false);
-                    cancelButton.setClickable(false);
-                    //buttonsLayout.setVisibility(View.GONE);
-                    layoutHidden = true;
-                }
                 if (addHidden) {
                     fabAddTask.startAnimation(fabUnHideLeft);
                     fabAddTask.setClickable(true);
@@ -497,26 +438,10 @@ public class EventDetailed extends AppCompatActivity {
                     fabAddTask.setClickable(false);
                     addHidden = true;
                 }
-                if (isOwner && layoutHidden) {
-                    buttonsLayout.startAnimation(fabUnHideDown);
-                    buttonsLayout.setClickable(true);
-                    okButton.setClickable(true);
-                    cancelButton.setClickable(true);
-                    //buttonsLayout.setVisibility(View.VISIBLE);
-                    layoutHidden = false;
-                }
                 if (participantsListAdapter != null)
                     participantsListAdapter.notifyDataSetChanged();
                 break;
             case PAYMENTS_POSITION:
-                if (!layoutHidden) {
-                    buttonsLayout.startAnimation(fabHideDown);
-                    buttonsLayout.setClickable(false);
-                    okButton.setClickable(false);
-                    cancelButton.setClickable(false);
-                    //buttonsLayout.setVisibility(View.GONE);
-                    layoutHidden = true;
-                }
                 if (!addHidden) {
                     fabAddTask.startAnimation(fabHideLeft);
                     fabAddTask.setClickable(false);
@@ -966,37 +891,6 @@ public class EventDetailed extends AppCompatActivity {
         }
     }*/
 
-    public void setEditLayoutVisibility (boolean visible) {
-        if (POSITION == PARTICIPANTS_POSITION) {
-            if (visible && layoutHidden) {
-                buttonsLayout.startAnimation(fabUnHideDown);
-                buttonsLayout.setClickable(true);
-                okButton.setClickable(true);
-                cancelButton.setClickable(true);
-                layoutHidden = false;
-                //buttonsLayout.setVisibility(View.GONE);
-            }
-
-            if (!visible && !layoutHidden) {
-                buttonsLayout.startAnimation(fabHideDown);
-                buttonsLayout.setClickable(false);
-                okButton.setClickable(false);
-                cancelButton.setClickable(false);
-                layoutHidden = true;
-                //buttonsLayout.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    public void setEditLayoutEnabled (boolean enabled) {
-        Button ok = findViewById(R.id.editParticipantsOkButton);
-        Button cancel = findViewById(R.id.editParticipantsCancelButton);
-        if (ok != null && cancel != null) {
-            ok.setEnabled(enabled);
-            cancel.setEnabled(enabled);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -1075,13 +969,17 @@ public class EventDetailed extends AppCompatActivity {
                     selected.put(originals.get(i).id, true);
                 }
             }
-            it = participantsCheckboxes.values().iterator();
+            it = participantsViews.values().iterator();
             while (it.hasNext()) {
-                ((CheckBox)it.next()).setChecked(false);
+                ImageButton addRemove = ((View)it.next()).findViewById(R.id.contactGmailImageButton);
+                addRemove.setImageResource(R.drawable.add_contact);
+                addRemove.setOnClickListener(listenerAdd);
             }
             for (int i = 0; i < originals.size(); i++) {
-                if (participantsCheckboxes.containsKey((Long) originals.get(i).id)) {
-                    participantsCheckboxes.get((Long) originals.get(i).id).setChecked(true);
+                if (participantsViews.containsKey(originals.get(i).id)) {
+                    ImageButton addRemove = ((View)it.next()).findViewById(R.id.contactGmailImageButton);
+                    addRemove.setImageResource(R.drawable.delete_2);
+                    addRemove.setOnClickListener(listenerRemove);
                 }
             }
         }
@@ -1122,7 +1020,7 @@ public class EventDetailed extends AppCompatActivity {
 
         private ArrayList<Person> participants;
         private Context context;
-        View.OnClickListener listener;
+
 
         public ParticipantsListAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Person> participants) {
             super(context, resource, participants);
@@ -1132,41 +1030,64 @@ public class EventDetailed extends AppCompatActivity {
             if (layOutInflater == null)
                 layOutInflater = LayoutInflater.from(EventDetailed.this);
 
-            listener = new View.OnClickListener() {
+            listenerAdd = new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CheckBox checkBox = (CheckBox) view;
-                    selected.put((long)checkBox.getTag(), checkBox.isChecked());
-                    setEditLayoutEnabled(true);
+                    ImageButton button = (ImageButton) view;
+                    selected.put((long) button.getTag(), true);
+                    onOkClick();
                 }
             };
 
-            participantsCheckboxes = new LinkedHashMap<>();
+            listenerRemove = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ImageButton button = (ImageButton) view;
+                    selected.put((long) button.getTag(), false);
+                    onOkClick();
+                }
+            };
+
+            participantsViews = new LinkedHashMap<>();
         }
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             Person p = getItem(position);
-            //if (view == null) { // ToDo: check this with a big list of participants
-                view = layOutInflater.inflate(R.layout.participants_layout, null);
-                CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
-                checkBox.setText(p.firstName + " " + p.lastName + " (" + p.numpers + ")");
-                checkBox.setTag(p.id);
-                checkBox.setOnClickListener(listener);
-                if (!isOwner) {
-                    checkBox.setChecked(true);
-                    checkBox.setFocusable(false);
-                    checkBox.setClickable(false);
+
+            view = layOutInflater.inflate(R.layout.contacts_gmail_layout, null);
+            TextView name = view.findViewById(R.id.contactGmailNameTextView);
+            TextView email = view.findViewById(R.id.contactGmailEmailTextView);
+            ImageButton addRemove = view.findViewById(R.id.contactGmailImageButton);
+            name.setText(p.firstName + " " + p.lastName);
+            email.setText(p.email);
+            if (!isOwner) {
+                addRemove.setClickable(false);
+            }   else {
+                if (!selected.get(contacts.get(position).id)) {
+                    addRemove.setImageResource(R.drawable.add_contact);
+                    addRemove.setTag(contacts.get(position).id);
+                    addRemove.setOnClickListener(listenerAdd);
                 }   else {
-                    checkBox.setChecked(selected.get(contacts.get(position).id));
+                    addRemove.setTag(contacts.get(position).id);
+                    addRemove.setOnClickListener(listenerRemove);
                 }
-                participantsCheckboxes.put(p.id, checkBox);
-            /*}   else {
-                CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
-                boolean checked = (selected.get(p.id) != null)? selected.get(p.id): true;
-                checkBox.setSelected(checked);
-                participantsCheckboxes.put(p.id, checkBox);
-            }*/
+            }
+            participantsViews.put(p.id, view);
+
+            /*view = layOutInflater.inflate(R.layout.participants_layout, null);
+            CheckBox checkBox = view.findViewById(R.id.participantCheckBox);
+            checkBox.setText(p.firstName + " " + p.lastName + " (" + p.numpers + ")");
+            checkBox.setTag(p.id);
+            checkBox.setOnClickListener(listener);
+            if (!isOwner) {
+                checkBox.setChecked(true);
+                checkBox.setFocusable(false);
+                checkBox.setClickable(false);
+            }   else {
+                checkBox.setChecked(selected.get(contacts.get(position).id));
+            }
+            participantsViews.put(p.id, checkBox);*/
 
             return view;
         }
@@ -1397,7 +1318,7 @@ public class EventDetailed extends AppCompatActivity {
 
     }
 
-    public void onOkClick (View view) {
+    public void onOkClick () {
         Event newEvent = new Event(event);
         newEvent.participants.clear();
         Iterator it = selected.keySet().iterator();
@@ -1415,12 +1336,6 @@ public class EventDetailed extends AppCompatActivity {
         }   catch (JSONException e) {
             e.printStackTrace();
         }
-        setEditLayoutEnabled(false);
-    }
-
-    public void onCancelClick (View view) {
-        forceBackParticipantsListView();
-        setEditLayoutEnabled(false);
     }
 
     public void editEvent () {
