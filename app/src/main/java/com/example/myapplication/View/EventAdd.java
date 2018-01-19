@@ -1,11 +1,16 @@
 package com.example.myapplication.View;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,6 +39,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 
 public class EventAdd extends AppCompatActivity {
@@ -46,7 +53,8 @@ public class EventAdd extends AppCompatActivity {
     ParticipantsListAdapter participantsListAdapter;
     EditText name;
     EditText description;
-    EditText date;
+    static EditText date;
+    static EditText time;
 
     Intent me;
     ObjectMapper mapper;
@@ -78,8 +86,7 @@ public class EventAdd extends AppCompatActivity {
         name = findViewById(R.id.addEventNameEditText);
         description = findViewById(R.id.addEventDescriptionEditText);
         date = findViewById(R.id.addEventDateEditText);
-
-
+        time = findViewById(R.id.addEventTimeEditText);
 
         setParticipantsList(person.id);
     }
@@ -90,7 +97,7 @@ public class EventAdd extends AppCompatActivity {
         newEvent.participants.add(person.id);
         newEvent.name = name.getText().toString();
         newEvent.description = description.getText().toString();
-        newEvent.date = date.getText().toString();
+        newEvent.date = date.getText().toString() + "T" + time.getText().toString();
         for (Person p : persons) {
             if (selected.get(p.id)) {
                 newEvent.participants.add(p.id);
@@ -118,13 +125,6 @@ public class EventAdd extends AppCompatActivity {
         participantsListView = findViewById(R.id.addEventParticipantsListView);
         participantsListAdapter = new ParticipantsListAdapter((Context) mThis, 0, persons);
         participantsListView.setAdapter(participantsListAdapter);
-        /*participantsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText((Context) mThis, "sdfasfd", Toast.LENGTH_SHORT);
-                Log.i("sdfasdfasdf", "asdaSCASDC");
-            }
-        });*/
     }
 
     public void setParticipantsList (final long pId) {
@@ -239,4 +239,56 @@ public class EventAdd extends AppCompatActivity {
         }
 
     }
+
+    public static String formatFill (int value, int total) {
+        String result = String.valueOf(value);
+        for (int i = result.length(); i < total; i++) {
+            result = "0" + result;
+        }
+        return result;
+    }
+
+    public static class TimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public void onTimeSet(android.widget.TimePicker view, int hourOfDay, int minute) {
+            Log.i("time", "Selected Time: " + String.valueOf(hourOfDay) + " : " + String.valueOf(minute));
+            time.setText(formatFill(hourOfDay, 2) + ":" + formatFill(minute, 2) + ":00");
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+            return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            Log.i("time", "Selected Time: " + String.valueOf(year) + ":" + formatFill(month, 2) + ":" + formatFill(day, 2));
+            date.setText(String.valueOf(year) + "-" + formatFill(month + 1, 2) + "-" + formatFill(day, 2));
+        }
+    }
+
+    public void onTimeClick(View v) {
+        TimePicker mTimePicker = new TimePicker();
+        mTimePicker.show(getFragmentManager(), "Select time");
+    }
+
+    public void onDateClick(View v) {
+        DatePickerFragment mDatePicker = new DatePickerFragment();
+        mDatePicker.show(getFragmentManager(), "Select date");
+    }
+
+
 }

@@ -44,9 +44,8 @@
                       android:layout_alignParentLeft="true"
                       android:gravity="start"
                       android:text="TextView"
-                      android:textColor="@android:color/black"
-                      android:textSize="12sp"
-                      />
+                      android:textColor="@color/colorGray"
+                      android:textSize="12sp" />
 
             </LinearLayout>
 

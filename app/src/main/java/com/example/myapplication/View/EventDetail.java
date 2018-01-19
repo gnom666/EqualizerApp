@@ -1,11 +1,17 @@
 package com.example.myapplication.View;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 
 public class EventDetail extends AppCompatActivity {
@@ -36,7 +43,8 @@ public class EventDetail extends AppCompatActivity {
 
     EditText name;
     EditText description;
-    EditText date;
+    static EditText date;
+    static EditText time;
 
     Intent me;
     ObjectMapper mapper;
@@ -76,10 +84,12 @@ public class EventDetail extends AppCompatActivity {
         name = findViewById(R.id.detailedEventNameEditText);
         description = findViewById(R.id.detailedEventDescriptionEditText);
         date = findViewById(R.id.detailedEventDateEditText);
+        time = findViewById(R.id.detailedEventTimeEditText);
 
         name.setText(event.name);
         description.setText(event.description);
-        date.setText(event.date);
+        date.setText(event.date.split("T")[0]);
+        time.setText(event.date.split("T")[1]);
 
         if (notOwner) {
             name.setFocusable(false);
@@ -133,7 +143,7 @@ public class EventDetail extends AppCompatActivity {
         if (!notOwner) {
             event.name = name.getText().toString();
             event.description = description.getText().toString();
-            event.date = date.getText().toString();
+            event.date = date.getText().toString() + "T" + time.getText().toString();
             try {
                 Log.i("Event", mapper.writeValueAsString(event));
                 updateEvent();
@@ -155,6 +165,57 @@ public class EventDetail extends AppCompatActivity {
     public void onCancelClick (View view) {
         setResult(RESULT_CANCELED, me);
         finish();
+    }
+
+
+    public static String formatFill (int value, int total) {
+        String result = String.valueOf(value);
+        for (int i = result.length(); i < total; i++) {
+            result = "0" + result;
+        }
+        return result;
+    }
+
+    public static class TimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public void onTimeSet(android.widget.TimePicker view, int hourOfDay, int minute) {
+            Log.i("time", "Selected Time: " + String.valueOf(hourOfDay) + " : " + String.valueOf(minute));
+            time.setText(formatFill(hourOfDay, 2) + ":" + formatFill(minute, 2) + ":00");
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+            return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            Log.i("time", "Selected Time: " + String.valueOf(year) + ":" + formatFill(month, 2) + ":" + formatFill(day, 2));
+            date.setText(String.valueOf(year) + "-" + formatFill(month + 1, 2) + "-" + formatFill(day, 2));
+        }
+    }
+
+    public void onTimeClick(View v) {
+        TimePicker mTimePicker = new TimePicker();
+        mTimePicker.show(getFragmentManager(), "Select time");
+    }
+
+    public void onDateClick(View v) {
+        DatePickerFragment mDatePicker = new DatePickerFragment();
+        mDatePicker.show(getFragmentManager(), "Select date");
     }
 
 }
