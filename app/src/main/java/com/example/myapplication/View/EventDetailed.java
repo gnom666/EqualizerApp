@@ -24,6 +24,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ import com.example.myapplication.Controller.PaymentServices;
 import com.example.myapplication.Controller.PersonServices;
 import com.example.myapplication.Controller.TasksServices;
 import com.example.myapplication.Controller.VolleyCallback;
+import com.example.myapplication.Model.Constants;
 import com.example.myapplication.Model.Event;
 import com.example.myapplication.Model.Payment;
 import com.example.myapplication.Model.Person;
@@ -73,6 +75,7 @@ public class EventDetailed extends AppCompatActivity {
     TasksListAdapter tasksListAdapter;
     ListView paymentsListView;
     PaymentsListAdapter paymentsListAdapter;
+    LinearLayout paymentsLayout;
 
     HashMap<Long, View> participantsViews;
     AbsListView.OnScrollListener onScrollListener;
@@ -90,8 +93,10 @@ public class EventDetailed extends AppCompatActivity {
     boolean expanded = false;
     boolean hidden = false;
     boolean addHidden = false;
-    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide, fabHideLeft, fabUnHideLeft;
+    boolean actionsHidden = true;
+    Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide, fabHideLeft, fabUnHideLeft, fabHideLeftDeep, fabUnHideLeftDeep;
     CountDownTimer timer;
+    FloatingActionButton checkAB, doublecheckAB, exclAB, resetAB;
 
     TabTasks tabTasks;
     TabParticipants tabParticipants;
@@ -201,6 +206,8 @@ public class EventDetailed extends AppCompatActivity {
         fabUnHide = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide);
         fabHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_left);
         fabUnHideLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_left);
+        fabHideLeftDeep = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.hide_left_deep);
+        fabUnHideLeftDeep = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.unhide_left_deep);
 
         fabExpander = findViewById(R.id.detailedEventExpand);
         fabExpander.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +217,17 @@ public class EventDetailed extends AppCompatActivity {
                     closeFabs();
                 }   else {
                     openFabs();
+                    timer = new CountDownTimer(4000, 4000){
+                        public void onTick(long millisUntilDone){}
+
+                        public void onFinish() {
+                            if (expanded) {
+                                closeFabs();
+                                expanded = false;
+                            }
+                            cancel();
+                        }
+                    }.start();
                 }
                 expanded = !expanded;
             }
@@ -218,6 +236,59 @@ public class EventDetailed extends AppCompatActivity {
         expanded = false;
         fabEdit.setClickable(false);
         fabDelete.setClickable(false);
+
+        checkAB = findViewById(R.id.checkActionButton);
+        doublecheckAB = findViewById(R.id.doublecheckActionButton);
+        exclAB = findViewById(R.id.exclamationActionButton);
+        resetAB = findViewById(R.id.resetActionButton);
+
+        checkAB.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                hideLeft();
+                actionsVisible(false);
+            }
+        });
+
+        doublecheckAB.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                hideLeft();
+                actionsVisible(false);
+            }
+        });
+
+        exclAB.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                hideLeft();
+                actionsVisible(false);
+            }
+        });
+
+        resetAB.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                hideLeft();
+                actionsVisible(false);
+            }
+        });
+
+        paymentsLayout = findViewById(R.id.paymentsListLayout);
+        if (paymentsLayout != null) {
+            paymentsLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (actionsHidden) {
+                        hideLeft();
+                    }
+                }
+            });
+        }
 
         onScrollListener = new AbsListView.OnScrollListener() {
             @Override
@@ -228,7 +299,8 @@ public class EventDetailed extends AppCompatActivity {
                         hidden = true;
                     }
                     if (timer != null) timer.cancel();
-                }   else {
+                }
+                if (scrollState == 0 && hidden){
                     startTimer(2000);
                 }
             }
@@ -255,7 +327,8 @@ public class EventDetailed extends AppCompatActivity {
                         hidden = true;
                     }
                     if (timer != null) timer.cancel();
-                }   else {
+                }
+                if (scrollState == 0 && hidden) {
                     startTimer(2000);
                 }
                 /*if (scrollState == 1) {
@@ -287,7 +360,8 @@ public class EventDetailed extends AppCompatActivity {
                         hidden = true;
                     }
                     if (timer != null) timer.cancel();
-                }   else {
+                }
+                if (scrollState == 0 && hidden){
                     startTimer(2000);
                 }
             }
@@ -379,6 +453,35 @@ public class EventDetailed extends AppCompatActivity {
         }.start();
     }
 
+    public void hideLeft () {
+        checkAB.startAnimation(fabHideLeftDeep);
+        doublecheckAB.startAnimation(fabHideLeftDeep);
+        exclAB.startAnimation(fabHideLeftDeep);
+        resetAB.startAnimation(fabHideLeftDeep);
+        actionsHidden = true;
+    }
+
+    public void unhideLeft () {
+        checkAB.startAnimation(fabUnHideLeftDeep);
+        doublecheckAB.startAnimation(fabUnHideLeftDeep);
+        exclAB.startAnimation(fabUnHideLeftDeep);
+        resetAB.startAnimation(fabUnHideLeftDeep);
+        actionsHidden = false;
+    }
+
+    public void actionsVisible (boolean visible) {
+        if (visible) {
+            checkAB.setVisibility(View.VISIBLE);
+            doublecheckAB.setVisibility(View.VISIBLE);
+            exclAB.setVisibility(View.VISIBLE);
+            resetAB.setVisibility(View.VISIBLE);
+        }   else {
+            checkAB.setVisibility(View.GONE);
+            doublecheckAB.setVisibility(View.GONE);
+            exclAB.setVisibility(View.GONE);
+            resetAB.setVisibility(View.GONE);
+        }
+    }
      /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -545,7 +648,8 @@ public class EventDetailed extends AppCompatActivity {
                                 }
 
                                 setTasks(event.id, force);
-                                setPayments(event.id, force);
+                                //setPayments(event.id, force);
+                                setPayments(event.id, false, force);
 
                                 if (!force) setParticipantsListView();
                                 else forceParticipantsListView();
@@ -569,6 +673,45 @@ public class EventDetailed extends AppCompatActivity {
         PaymentServices paymentServices = new PaymentServices();
 
         paymentServices.testPayments(this, aId,
+                new VolleyCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        try {
+                            payments = mapper.readValue(response, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Payment.class));
+                            if (payments != null) {
+
+                                for (Payment p : payments) {
+                                    //Person from = (Person ) Utils.byId(participants, p.from, Person.class);
+                                    Person from = findPerson(participants, p.from);
+                                    if (from == null) from = person;
+                                    //Person to = (Person) Utils.byId(participants, p.to, Person.class);
+                                    Person to = findPerson(participants, p.to);
+                                    if (to == null) to = person;
+                                    Log.i("payment: ", "from " + from.lastName + " to " + to.lastName + " (" + p.amount + " )");
+                                }
+
+                                if (!force) setPaymentsListView();
+                                else forcePaymentsListView();
+
+                            }
+                        }   catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VolleyError", error.getMessage());
+                    }
+                });
+    }
+
+    public void setPayments (final long aId, final boolean redo, final boolean force) {
+
+        PaymentServices paymentServices = new PaymentServices();
+
+        paymentServices.calculatePayments(this, aId, redo,
                 new VolleyCallback() {
                     @Override
                     public void onSuccessResponse(String response) {
@@ -698,7 +841,8 @@ public class EventDetailed extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Task " + task.name + " deleted", Toast.LENGTH_SHORT).show();
 
                                     setTasks(event.id, true);
-                                    setPayments(event.id, true);
+                                    //setPayments(event.id, true);
+                                    setPayments(event.id, true, true);
 
                                     setResult(RESULT_OK, me);
                                 }   else {
@@ -924,7 +1068,8 @@ public class EventDetailed extends AppCompatActivity {
             }
 
             setTasks(event.id, true);
-            setPayments(event.id, true);
+            //setPayments(event.id, true);
+            setPayments(event.id, true, true);
 
             setResult(RESULT_OK, me);
 
@@ -944,7 +1089,8 @@ public class EventDetailed extends AppCompatActivity {
             }
 
             setTasks(event.id, true);
-            setPayments(event.id, true);
+            //setPayments(event.id, true);
+            setPayments(event.id, true, true);
 
             setResult(RESULT_OK, me);
 
@@ -953,6 +1099,7 @@ public class EventDetailed extends AppCompatActivity {
 
         }
     }
+
 
 
 
@@ -998,6 +1145,7 @@ public class EventDetailed extends AppCompatActivity {
         participantsListView.setAdapter(participantsListAdapter);
 
         participantsListView.setOnScrollListener(onScrollParticipantsListener);
+
     }
 
     public void setParticipantsListView () {
@@ -1014,6 +1162,7 @@ public class EventDetailed extends AppCompatActivity {
         }
 
         participantsListView.setOnScrollListener(onScrollParticipantsListener);
+
     }
 
     public class ParticipantsListAdapter extends ArrayAdapter<Person> {
@@ -1105,6 +1254,7 @@ public class EventDetailed extends AppCompatActivity {
 
         tasksListView.setOnScrollListener(onScrollListener);
 
+
     }
 
     public void setTasksListView () {
@@ -1117,6 +1267,7 @@ public class EventDetailed extends AppCompatActivity {
         }
 
         tasksListView.setOnScrollListener(onScrollListener);
+
     }
 
     public class TasksListAdapter extends ArrayAdapter<Task> {
@@ -1209,6 +1360,7 @@ public class EventDetailed extends AppCompatActivity {
         paymentsListView.setAdapter(paymentsListAdapter);
 
         paymentsListView.setOnScrollListener(onScrollPaymentsListener);
+
     }
 
     public void setPaymentsListView () {
@@ -1225,6 +1377,7 @@ public class EventDetailed extends AppCompatActivity {
         }
 
         paymentsListView.setOnScrollListener(onScrollPaymentsListener);
+
     }
 
     public class PaymentsListAdapter extends ArrayAdapter<Payment> {
@@ -1281,17 +1434,41 @@ public class EventDetailed extends AppCompatActivity {
                 amount.setText(Utils.amount2string(p.amount));
 
                 if (!mustPay) {
-                    direction.setImageResource(R.drawable.left_shadow_green);
+                    if (p.status == Constants.PaymentStatus.REQUESTED)
+                        direction.setImageResource(R.drawable.check);
+                    else if (p.status == Constants.PaymentStatus.PAID)
+                        direction.setImageResource(R.drawable.doublecheck);
+                    else
+                        direction.setImageResource(R.drawable.left_shadow_green);
+                }   else {
+                    if (p.status == Constants.PaymentStatus.REQUESTED)
+                        direction.setImageResource(R.drawable.check_red);
+                    else if (p.status == Constants.PaymentStatus.PAID)
+                        direction.setImageResource(R.drawable.doublecheck_red);
+                    else
+                        direction.setImageResource(R.drawable.right_shadow_red);
                 }
+                if (p.status == Constants.PaymentStatus.CONFLICT)
+                    direction.setImageResource(R.drawable.exclamation_orange);
             }   else {
                 String text = "";
                 String sep = " - ";
 
-                direction.setImageResource(R.drawable.right_shadow_blue);
+                if (p.status == Constants.PaymentStatus.REQUESTED)
+                    direction.setImageResource(R.drawable.check_blue);
+                else if (p.status == Constants.PaymentStatus.PAID)
+                    direction.setImageResource(R.drawable.doublecheck_blue);
+                else
+                    direction.setImageResource(R.drawable.right_shadow_blue);
 
                 Person from = findPerson(participants, p.from);
                 if (from.id == person.id) {
-                    direction.setImageResource(R.drawable.right_shadow_red);
+                    if (p.status == Constants.PaymentStatus.REQUESTED)
+                        direction.setImageResource(R.drawable.check_red);
+                    else if (p.status == Constants.PaymentStatus.PAID)
+                        direction.setImageResource(R.drawable.doublecheck_red);
+                    else
+                        direction.setImageResource(R.drawable.right_shadow_red);
                     sep = "";
                 }   else {
                     text += from.firstName + " " + from.lastName;
@@ -1299,11 +1476,19 @@ public class EventDetailed extends AppCompatActivity {
 
                 Person to = findPerson(participants, p.to);
                 if (to.id == person.id) {
-                    direction.setImageResource(R.drawable.left_shadow_green );
+                    if (p.status == Constants.PaymentStatus.REQUESTED)
+                        direction.setImageResource(R.drawable.check);
+                    else if (p.status == Constants.PaymentStatus.PAID)
+                        direction.setImageResource(R.drawable.doublecheck);
+                    else
+                        direction.setImageResource(R.drawable.left_shadow_green );
                     sep = "";
                 }   else {
                     text += sep + to.firstName + " " + to.lastName;
                 }
+
+                if (p.status == Constants.PaymentStatus.CONFLICT)
+                    direction.setImageResource(R.drawable.exclamation_orange);
 
                 name.setText(text);
 
@@ -1313,9 +1498,21 @@ public class EventDetailed extends AppCompatActivity {
 
             }
 
+            direction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onActionClick();
+                }
+            });
+
             return view;
         }
 
+    }
+
+    public void onActionClick () {
+        actionsVisible(true);
+        unhideLeft();
     }
 
     public void onOkClick () {

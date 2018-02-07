@@ -73,6 +73,7 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
     FloatingActionButton fabExpander;
     boolean expanded = false;
     boolean hidden = false;
+    int action = 0;
     Animation fabOpen, fabClose, fabRotateCW, fabRotateACW, fabHide, fabUnHide;
 
     CountDownTimer timer;
@@ -167,6 +168,17 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                 closeFabs();
             }   else {
                 openFabs();
+                timer = new CountDownTimer(4000, 4000){
+                    public void onTick(long millisUntilDone){}
+
+                    public void onFinish() {
+                        if (expanded) {
+                            closeFabs();
+                            expanded = false;
+                        }
+                        cancel();
+                    }
+                }.start();
             }
             expanded = !expanded;
             }
@@ -178,6 +190,7 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
         fabLogout.setClickable(false);
 
         googleHelper = new GoogleHelper(this, this, null);
+
     }
 
     /*@Override
@@ -282,7 +295,6 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                 // Show an expanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-                Log.i("checkPerm", "no");
                 callOldContacts();
 
             }   else {
@@ -293,14 +305,11 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                         new String[]{android.Manifest.permission.READ_CONTACTS},
                         readContactsRequest);
 
-                Log.i("checkPerm", "requested");
-
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
         }   else {
-            Log.i("checkPerm", "granted");
             if (acct != null) {
                 callNewContacts();
             }   else {
@@ -490,13 +499,14 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                     if (scrollState == 1) {
                         if (!hidden) {
                             fabsVisibility(false);
-                            hidden = true;
                         }
                         if (timer != null) timer.cancel();
-                    }   else {
+                    }
+                    if (scrollState == 0 && hidden) {
                         startTimer(2000);
                     }
-                    Log.i("scrollState", "" + scrollState);
+                    action = scrollState + 1;
+                    Log.i("scroll", "" + scrollState);
                 }
 
                 @Override
@@ -510,6 +520,16 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
                     }*/
                 }
             });
+
+            View layout = findViewById(R.id.userPageContent);
+            if (layout != null) {
+                layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("layout", "click");
+                    }
+                });
+            }
         }
     }
 
@@ -627,7 +647,6 @@ public class UserPage extends AppCompatActivity implements GoogleListener {
     public void onGoogleAuthSignOut() {
 
     }
-
 
     public class EventsExpandableListAdapter extends BaseExpandableListAdapter {
 

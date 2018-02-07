@@ -71,7 +71,8 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
-        app:backgroundTint="@android:color/holo_green_light"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
         app:layout_anchor="@+id/container"
         app:layout_anchorGravity="left|bottom"
         app:srcCompat="@drawable/add" />
@@ -83,7 +84,8 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="120dp"
         android:layout_marginRight="8dp"
-        app:backgroundTint="@android:color/holo_green_light"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
         app:srcCompat="@drawable/edit2"
         android:visibility="invisible"
         />
@@ -95,7 +97,8 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="64dp"
         android:layout_marginRight="8dp"
-        app:backgroundTint="@android:color/holo_red_light"
+        app:backgroundTint="@color/colorRed"
+        app:rippleColor="@color/colorRedLight"
         app:srcCompat="@drawable/delete"
         android:visibility="invisible"
         />
@@ -107,8 +110,69 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="8dp"
         android:layout_marginRight="8dp"
-        app:backgroundTint="@android:color/holo_blue_light"
+        app:backgroundTint="@color/colorAccent"
+        app:rippleColor="@color/colorAccentLight"
         app:srcCompat="@drawable/open_up" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/checkActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:srcCompat="@drawable/check_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/doublecheckActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="56dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:srcCompat="@drawable/doublecheck_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/exclamationActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="104dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorRed"
+        app:rippleColor="@color/colorRedLight"
+        app:srcCompat="@drawable/exclamation_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/resetActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="152dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorAccent"
+        app:rippleColor="@color/colorAccentLight"
+        app:srcCompat="@drawable/reset_white" />
 
     <!-- android.support.design.widget.FloatingActionButton
         android:id="@+id/expander2"

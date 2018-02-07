@@ -34,6 +34,13 @@ public final class Constants {
     public static String URL_DeleteTask = "http://" + IP + ":" + PORT + "/tasks/deletetask/";
 
     public static String URL_TestPayments = "http://" + IP + ":" + PORT + "/payments/testpayments/";
+    public static String URL_GeneratePayments = "http://" + IP + ":" + PORT + "/payments/generatepayments/";
+    public static String URL_CalculatePayments = "http://" + IP + ":" + PORT + "/payments/calculatepayments/";
+    public static String URL_MakePayment = "http://" + IP + ":" + PORT + "/payments/makepay/";
+    public static String URL_AcceptPayment = "http://" + IP + ":" + PORT + "/payments/acceptpay/";
+    public static String URL_SuePayment = "http://" + IP + ":" + PORT + "/payments/suepay/";
+    public static String URL_ResetPayment = "http://" + IP + ":" + PORT + "/payments/resetpay/";
+    public static String URL_ForceResetPayment = "http://" + IP + ":" + PORT + "/payments/forceresetpay/";
 
     public static enum ErrorCode {
         UNKNOWN,

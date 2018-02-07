@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.myapplication.View.UserPage">
+    tools:context="com.example.myapplication.View.UserPage"
+    android:id="@+id/mainUserPage">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -42,12 +43,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="176dp"
         android:clickable="true"
-        android:tint="@android:color/background_light"
         app:backgroundTint="@android:color/holo_red_light"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
-        app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/logout"
+        app:rippleColor="@color/colorRedLight"
+        app:srcCompat="@drawable/logout2"
         android:visibility="invisible"/>
 
     <android.support.design.widget.FloatingActionButton
@@ -58,12 +58,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="120dp"
         android:clickable="true"
-        android:tint="@android:color/background_light"
         app:backgroundTint="@android:color/holo_blue_light"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
-        app:rippleColor="@android:color/holo_blue_bright"
-        app:srcCompat="@drawable/contact"
+        app:rippleColor="@color/colorAccentLight"
+        app:srcCompat="@drawable/contacts"
         android:visibility="invisible"/>
 
     <android.support.design.widget.FloatingActionButton
@@ -74,11 +73,10 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="64dp"
         android:clickable="true"
-        android:tint="@android:color/background_light"
         app:backgroundTint="@android:color/holo_green_light"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
-        app:rippleColor="@android:color/holo_blue_bright"
+        app:rippleColor="@color/colorGreenLight"
         app:srcCompat="@drawable/add"
         android:visibility="invisible"/>
 
@@ -90,11 +88,10 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:clickable="true"
-        android:tint="@android:color/background_light"
         app:backgroundTint="@color/colorPrimary"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="right|bottom"
-        app:rippleColor="@android:color/holo_blue_bright"
+        app:rippleColor="@color/colorAccentLight"
         app:srcCompat="@drawable/open_up" />
 
     <include

@@ -38,7 +38,7 @@ public class EventDetail extends AppCompatActivity {
     Person person;
     ArrayList<Person> contacts;
     LinkedHashMap<Long, Boolean> selected;
-    Event event;
+    static Event event;
     boolean notOwner;
 
     EditText name;
@@ -187,8 +187,13 @@ public class EventDetail extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Calendar c = Calendar.getInstance();
+            String itime = event.date.split("T")[1];
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
+            if (!itime.isEmpty() && itime.length() == 8) {
+                hour = Integer.valueOf(itime.split(":")[0]);
+                minute = Integer.valueOf(itime.split(":")[1]);
+            }
             return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
         }
     }
@@ -197,9 +202,15 @@ public class EventDetail extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Calendar c = Calendar.getInstance();
+            String idate = event.date.split("T")[0];
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
+            if (!idate.isEmpty() && idate.length() == 10) {
+                year = Integer.valueOf(idate.split("-")[0]);
+                month = Integer.valueOf(idate.split("-")[1]) - 1;
+                day = Integer.valueOf(idate.split("-")[2]);
+            }
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
         public void onDateSet(DatePicker view, int year, int month, int day) {
