@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.myapplication.View.EventDetailed">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_light"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/eventDetailedToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_weight="1"
+            android:background="@android:color/holo_blue_light"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="@string/app_name">
+
+        </android.support.v7.widget.Toolbar>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_dark"
+            app:tabIndicatorColor="@android:color/holo_green_light">
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabTasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_tasks" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabParticipants"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_participants" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabPayments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_payments" />
+
+        </android.support.design.widget.TabLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </android.support.v4.view.ViewPager>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventAddTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:layout_anchor="@+id/container"
+        app:layout_anchorGravity="left|bottom"
+        app:srcCompat="@drawable/add" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/updateActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="176dp"
+        android:layout_marginRight="8dp"
+        android:clickable="true"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorAccent"
+        app:rippleColor="@color/colorAccentLight"
+        app:srcCompat="@drawable/reset_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="120dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:srcCompat="@drawable/edit2"
+        android:visibility="invisible"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventDelete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="64dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@color/colorRed"
+        app:rippleColor="@color/colorRedLight"
+        app:srcCompat="@drawable/delete"
+        android:visibility="invisible"
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detailedEventExpand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        app:backgroundTint="@color/colorAccent"
+        app:rippleColor="@color/colorAccentLight"
+        app:srcCompat="@drawable/open_up" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/checkActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:srcCompat="@drawable/check_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/doublecheckActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="56dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorGreen"
+        app:rippleColor="@color/colorGreenLight"
+        app:srcCompat="@drawable/doublecheck_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/exclamationActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="104dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorRed"
+        app:rippleColor="@color/colorRedLight"
+        app:srcCompat="@drawable/exclamation_white" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/resetActionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="152dp"
+        android:clickable="true"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorAccent"
+        app:rippleColor="@color/colorAccentLight"
+        app:srcCompat="@drawable/reset_white" />
+
+    <!-- android.support.design.widget.FloatingActionButton
+        android:id="@+id/expander2"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:tint="@android:color/background_light"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="end|bottom"
+        app:rippleColor="@android:color/holo_blue_bright"
+        app:srcCompat="@drawable/open_up" / -->
+
+</android.support.design.widget.CoordinatorLayout>
