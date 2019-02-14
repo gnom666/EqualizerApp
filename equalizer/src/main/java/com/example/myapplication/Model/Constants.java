@@ -2,7 +2,7 @@ package com.example.myapplication.Model;
 
 public final class Constants {
 
-    public static String IP_HOME = "192.168.1.109";
+    public static String IP_HOME = "192.168.1.107";
     public static String IP_WORK = "192.168.1.65";
     public static String IP_EC2 = "52.47.157.126";
     public static String DNS_GLOBAL = "ubuntu@ec2-35-180-32-57.eu-west-3.compute.amazonaws.com";

@@ -2,11 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
+
         config {
             keyAlias 'key0'
-            keyPassword 'qweqwe'
-            storeFile file('/Users/jorge.rios/keystore2')
-            storePassword 'qweqwe'
+            keyPassword 'Qazwsxedc.123'
+            storeFile file('/Users/jgro/keystore')
+            storePassword 'Qazwsxedc.123'
         }
     }
     compileSdkVersion 26
